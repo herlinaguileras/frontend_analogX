@@ -8,9 +8,13 @@ import type {
   DatasetMetadata,
   EarthRegion,
   FindingItem,
+  HabitatShieldingAnalysis,
+  IsruFeasibilityAnalysis,
+  MissionQualificationScorecard,
   MissionUseCase,
   PlanetaryRegion,
   PlanetaryTarget,
+  RoverMobilityAnalysis,
   ScientificObservation,
   ScientificSource,
   VerificationStatus,
@@ -206,5 +210,80 @@ export async function fetchMissionUseCases(category?: string): Promise<ListRespo
     return await res.json();
   } catch {
     return { items: [], next_cursor: null };
+  }
+}
+
+export async function fetchMissionScorecard(
+  earthRegionId: string,
+  planetaryTargetId: string
+): Promise<MissionQualificationScorecard | null> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/missions/scorecard?earth_region_id=${encodeURIComponent(earthRegionId)}&planetary_target_id=${encodeURIComponent(planetaryTargetId)}`,
+      {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(4000),
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchRoverMobility(earthRegionId: string): Promise<RoverMobilityAnalysis | null> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/missions/mobility?earth_region_id=${encodeURIComponent(earthRegionId)}`,
+      {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(4000),
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchIsruFeasibility(earthRegionId: string): Promise<IsruFeasibilityAnalysis | null> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/missions/isru?earth_region_id=${encodeURIComponent(earthRegionId)}`,
+      {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(4000),
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchHabitatShielding(earthRegionId: string): Promise<HabitatShieldingAnalysis | null> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(
+      `${baseUrl}/api/missions/habitat-shielding?earth_region_id=${encodeURIComponent(earthRegionId)}`,
+      {
+        headers: { Accept: "application/json" },
+        signal: AbortSignal.timeout(4000),
+        cache: "no-store",
+      }
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return null;
   }
 }

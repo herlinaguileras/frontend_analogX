@@ -5,7 +5,22 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { comparisonVariables, studyRegions, verificationLabels } from "@/lib/study-catalog";
 import type { ComparisonPayload, EarthRegion, VerificationStatus } from "@/lib/scientific-types";
-import { fetchCompare, fetchRegionDetail, fetchRegions, type RegionDetailResponse } from "@/lib/api";
+import {
+  fetchCompare,
+  fetchHabitatShielding,
+  fetchIsruFeasibility,
+  fetchMissionScorecard,
+  fetchRegionDetail,
+  fetchRegions,
+  fetchRoverMobility,
+  type RegionDetailResponse,
+} from "@/lib/api";
+import type {
+  HabitatShieldingAnalysis,
+  IsruFeasibilityAnalysis,
+  MissionQualificationScorecard,
+  RoverMobilityAnalysis,
+} from "@/lib/scientific-types";
 import { Icon } from "./icon";
 import { TerrainArt } from "./terrain-art";
 import { RegionPreview } from "./region-preview";
@@ -144,6 +159,12 @@ export function Exploration({
   const [comparison, setComparison] = useState<ComparisonPayload | null>(null);
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const briefingDialogRef = useRef<HTMLDialogElement>(null);
+  const [activeCompareTab, setActiveCompareTab] = useState<"variables" | "scorecard" | "mobility" | "isru_habitat">("variables");
+  const [scorecard, setScorecard] = useState<MissionQualificationScorecard | null>(null);
+  const [mobility, setMobility] = useState<RoverMobilityAnalysis | null>(null);
+  const [isru, setIsru] = useState<IsruFeasibilityAnalysis | null>(null);
+  const [habitat, setHabitat] = useState<HabitatShieldingAnalysis | null>(null);
 
   // Cargar regiones desde el backend
   useEffect(() => {
@@ -180,6 +201,18 @@ export function Exploration({
       if (isMounted && res) {
         setComparison(res);
       }
+    });
+    fetchMissionScorecard(selectedId, targetId).then(res => {
+      if (isMounted && res) setScorecard(res);
+    });
+    fetchRoverMobility(selectedId).then(res => {
+      if (isMounted && res) setMobility(res);
+    });
+    fetchIsruFeasibility(selectedId).then(res => {
+      if (isMounted && res) setIsru(res);
+    });
+    fetchHabitatShielding(selectedId).then(res => {
+      if (isMounted && res) setHabitat(res);
     });
     return () => {
       isMounted = false;
@@ -462,72 +495,381 @@ export function Exploration({
 
           {mode === "compare" && (
             <>
-              <ComparisonTable region={selected} body={body} expanded comparison={comparison} />
+              <div className="compare-nav-tabs">
+                <button
+                  type="button"
+                  className={`tab-button ${activeCompareTab === "variables" ? "active" : ""}`}
+                  onClick={() => setActiveCompareTab("variables")}
+                >
+                  <Icon name="science" size={14} />
+                  Matriz de Variables
+                </button>
+                <button
+                  type="button"
+                  className={`tab-button ${activeCompareTab === "scorecard" ? "active" : ""}`}
+                  onClick={() => setActiveCompareTab("scorecard")}
+                >
+                  <Icon name="check" size={14} />
+                  Scorecard 7 Dimensiones NASA
+                </button>
+                <button
+                  type="button"
+                  className={`tab-button ${activeCompareTab === "mobility" ? "active" : ""}`}
+                  onClick={() => setActiveCompareTab("mobility")}
+                >
+                  <Icon name="explore" size={14} />
+                  Movilidad y Tracción Rover
+                </button>
+                <button
+                  type="button"
+                  className={`tab-button ${activeCompareTab === "isru_habitat" ? "active" : ""}`}
+                  onClick={() => setActiveCompareTab("isru_habitat")}
+                >
+                  <Icon name="layers" size={14} />
+                  Hábitat Subterráneo e ISRU
+                </button>
+                <button
+                  type="button"
+                  className="tab-button"
+                  style={{ marginLeft: "auto", borderColor: "#9770ed", color: "#d9c5fc" }}
+                  onClick={() => briefingDialogRef.current?.showModal()}
+                >
+                  <Icon name="download" size={14} />
+                  Briefing Técnico NASA (PDF)
+                </button>
+              </div>
 
-              {comparison?.mission_use_cases && comparison.mission_use_cases.length > 0 && (
-                <section className="panel mission-cases-panel">
-                  <div className="panel-title">
-                    <h2>Utilidad Operacional para Misiones Espaciales (NASA Challenge)</h2>
-                    <span className="subtle-tag">NASA SPACE APPS 2026</span>
-                  </div>
-                  <p className="table-description">
-                    Justificación funcional de cómo este análogo terrestre ayuda a resolver desafíos de misiones reales (Artemis, rovers, hábitats e ISRU).
-                  </p>
-                  <div className="mission-cases-list">
-                    {comparison.mission_use_cases.map(useCase => (
-                      <article key={useCase.id} className="mission-card">
-                        <div className="mission-card-header">
-                          <span className="mission-card-title">{useCase.title}</span>
-                          <span className="mission-badge">{useCase.applicable_mission}</span>
-                          <span className="mission-badge dimension">{useCase.nasa_challenge_dimension}</span>
-                        </div>
-                        <p className="mission-card-desc">{useCase.description}</p>
-                        <div className="mission-card-meta">
-                          <span><strong>Método:</strong> {useCase.operational_method}</span>
-                          <span><strong>TRL:</strong> {useCase.trl_readiness}/9</span>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
+              {activeCompareTab === "variables" && (
+                <>
+                  <ComparisonTable region={selected} body={body} expanded comparison={comparison} />
 
-                  <div className="nasa-trek-buttons">
-                    {body === "Mars" ? (
-                      <a
-                        href="https://trek.nasa.gov/mars/#v=0.1&x=-139.0&y=-38.8&z=5"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="nasa-trek-btn"
-                      >
-                        <Icon name="explore" size={14} />
-                        Explorar Terra Sirenum en NASA Mars Trek
-                        <Icon name="arrow" size={12} />
-                      </a>
-                    ) : (
-                      <>
-                        <a
-                          href="https://trek.nasa.gov/moon/#v=0.1&x=0.0&y=-89.9&z=6"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="nasa-trek-btn"
-                        >
-                          <Icon name="explore" size={14} />
-                          Explorar Polo Sur Lunar en NASA Moon Trek
-                          <Icon name="arrow" size={12} />
-                        </a>
-                        <a
-                          href="https://quickmap.lroc.asu.edu/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="nasa-trek-btn"
-                        >
-                          <Icon name="layers" size={14} />
-                          Ver capas en LROC QuickMap (LOLA / Diviner)
-                          <Icon name="arrow" size={12} />
-                        </a>
-                      </>
+                  {comparison?.mission_use_cases && comparison.mission_use_cases.length > 0 && (
+                    <section className="panel mission-cases-panel">
+                      <div className="panel-title">
+                        <h2>Utilidad Operacional para Misiones Espaciales (NASA Challenge)</h2>
+                        <span className="subtle-tag">NASA SPACE APPS 2026</span>
+                      </div>
+                      <p className="table-description">
+                        Justificación funcional de cómo este análogo terrestre ayuda a resolver desafíos de misiones reales (Artemis, rovers, hábitats e ISRU).
+                      </p>
+                      <div className="mission-cases-list">
+                        {comparison.mission_use_cases.map(useCase => (
+                          <article key={useCase.id} className="mission-card">
+                            <div className="mission-card-header">
+                              <span className="mission-card-title">{useCase.title}</span>
+                              <span className="mission-badge">{useCase.applicable_mission}</span>
+                              <span className="mission-badge dimension">{useCase.nasa_challenge_dimension}</span>
+                            </div>
+                            <p className="mission-card-desc">{useCase.description}</p>
+                            <div className="mission-card-meta">
+                              <span><strong>Método:</strong> {useCase.operational_method}</span>
+                              <span><strong>TRL:</strong> {useCase.trl_readiness}/9</span>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+
+                      <div className="nasa-trek-buttons">
+                        {body === "Mars" ? (
+                          <a
+                            href="https://trek.nasa.gov/mars/#v=0.1&x=-139.0&y=-38.8&z=5"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="nasa-trek-btn"
+                          >
+                            <Icon name="explore" size={14} />
+                            Explorar Terra Sirenum en NASA Mars Trek
+                            <Icon name="arrow" size={12} />
+                          </a>
+                        ) : (
+                          <>
+                            <a
+                              href="https://trek.nasa.gov/moon/#v=0.1&x=0.0&y=-89.9&z=6"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="nasa-trek-btn"
+                            >
+                              <Icon name="explore" size={14} />
+                              Explorar Polo Sur Lunar en NASA Moon Trek
+                              <Icon name="arrow" size={12} />
+                            </a>
+                            <a
+                              href="https://quickmap.lroc.asu.edu/"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="nasa-trek-btn"
+                            >
+                              <Icon name="layers" size={14} />
+                              Ver capas en LROC QuickMap (LOLA / Diviner)
+                              <Icon name="arrow" size={12} />
+                            </a>
+                          </>
+                        )}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
+
+                            {activeCompareTab === "scorecard" && (
+                <section className="panel scorecard-panel">
+                  <div className="scorecard-header">
+                    <div>
+                      <div className="eyebrow"><span />EVALUACIÓN DE CALIFICACIÓN DE MISIÓN</div>
+                      <h2>Scorecard de 7 Dimensiones NASA</h2>
+                      <p style={{ fontSize: "10px", color: "#9ea3b9", marginTop: "4px" }}>
+                        Evaluación según la rúbrica oficial del Space Apps Challenge: similitud funcional, divergencia física explícita y protocolos de prueba.
+                      </p>
+                    </div>
+                    {scorecard && (
+                      <div className="scorecard-badges">
+                        <span className="fidelity-badge">Fidelidad: {scorecard.overall_operational_fidelity}/5</span>
+                        <span className="trl-badge">TRL Estimado: {scorecard.trl_level}/9</span>
+                      </div>
                     )}
                   </div>
+
+                  {scorecard ? (
+                    <>
+                      <div style={{ background: "#171a2b", padding: "12px 14px", borderRadius: "6px", border: "1px solid #2b324d", marginBottom: "16px" }}>
+                        <span style={{ fontSize: "9px", textTransform: "uppercase", color: "#9d98bd", fontWeight: 700 }}>Utilidad Primaria de Misión</span>
+                        <p style={{ fontSize: "11px", color: "#f0ecfc", marginTop: "4px", lineHeight: "1.5" }}>{scorecard.primary_mission_role}</p>
+                        <p style={{ fontSize: "9.5px", color: "#a8abcf", marginTop: "6px" }}>
+                          <strong>Campaña recomendada:</strong> {scorecard.recommended_analog_campaign}
+                        </p>
+                      </div>
+
+                      <div className="dimension-cards-grid">
+                        {scorecard.dimensions.map((dim, idx) => (
+                          <article key={dim.dimension_name} className="dimension-card">
+                            <div className="dimension-card-top">
+                              <span className="dimension-card-title">{idx + 1}. {dim.dimension_name}</span>
+                              <div className="fidelity-meter" title={`Fidelidad: ${dim.fidelity_score}/5`}>
+                                {[1, 2, 3, 4, 5].map(dot => (
+                                  <span
+                                    key={dot}
+                                    className={`fidelity-dot ${dot <= dim.fidelity_score ? "filled" : ""}`}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <span style={{ fontSize: "8.5px", color: "#85d3b2", fontWeight: 600 }}>Calificación: {dim.fidelity_score}/5</span>
+                            <div className="dimension-text">
+                              <strong>Alineación Operacional:</strong> {dim.analog_match_summary}
+                            </div>
+                            <div className="divergence-box">
+                              <strong>Divergencia Física:</strong> {dim.divergence_summary}
+                            </div>
+                            <div className="test-protocol-box">
+                              <strong>Protocolo de Prueba:</strong> {dim.applicable_test_protocol}
+                            </div>
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "8.5px", color: "#777c98", marginTop: "4px", paddingTop: "6px", borderTop: "1px solid #202438" }}>
+                              <span><strong>Dataset:</strong> {dim.nasa_dataset_reference}</span>
+                            </div>
+                          </article>
+                        ))}
+                      </div>
+
+                      <div style={{ marginTop: "16px", padding: "12px", background: "#1a1622", borderLeft: "3px solid #b879eb", borderRadius: "4px", fontSize: "9.5px", color: "#c8bee0", lineHeight: "1.5" }}>
+                        <strong>Límites Epistemológicos:</strong>
+                        <ul style={{ margin: "6px 0 0 16px", padding: 0 }}>
+                          {scorecard.epistemological_limitations.map((limit, idx) => (
+                            <li key={idx} style={{ marginBottom: "3px" }}>{limit}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ padding: "30px", textAlign: "center", color: "#8489a2" }}>
+                      Cargando evaluación de 7 dimensiones de la NASA…
+                    </div>
+                  )}
                 </section>
+              )}
+
+              {activeCompareTab === "mobility" && (
+                <section className="panel scorecard-panel">
+                  <div className="scorecard-header">
+                    <div>
+                      <div className="eyebrow"><span />ANÁLISIS GEOTÉCNICO Y TERRADINÁMICA</div>
+                      <h2>Movilidad y Tracción de Rovers</h2>
+                      <p style={{ fontSize: "10px", color: "#9ea3b9", marginTop: "4px" }}>
+                        Pruebas de hundimiento, desgaste de ruedas grousers y derrape para plataformas robóticas de exploración.
+                      </p>
+                    </div>
+                    {mobility && (
+                      <div className="scorecard-badges">
+                        <span className={`slip-risk-badge ${mobility.traction_slip_risk}`}>
+                          Riesgo de derrape: {mobility.traction_slip_risk}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {mobility ? (
+                    <>
+                      <div className="mobility-grid">
+                        <div className="mobility-stat-card">
+                          <span className="mobility-stat-title">Plataforma Rover de Referencia</span>
+                          <span className="mobility-stat-value" style={{ color: "#d0b8ff" }}>{mobility.analog_rover_platform}</span>
+                          <span style={{ fontSize: "9px", color: "#9398b0" }}>Mecatrónica de tracción análoga</span>
+                        </div>
+                        <div className="mobility-stat-card">
+                          <span className="mobility-stat-title">Capacidad Portante del Suelo</span>
+                          <span className="mobility-stat-value" style={{ fontSize: "11px" }}>{mobility.surface_bearing_capacity}</span>
+                          <span style={{ fontSize: "9px", color: "#9398b0" }}>Resistencia al hundimiento</span>
+                        </div>
+                        <div className="mobility-stat-card">
+                          <span className="mobility-stat-title">Pendiente Media Regional</span>
+                          <span className="mobility-stat-value">{mobility.regional_avg_slope_deg}°</span>
+                          <span style={{ fontSize: "9px", color: "#9398b0" }}>Pendiente máxima segura: {mobility.max_safe_slope_deg}°</span>
+                        </div>
+                        <div className="mobility-stat-card">
+                          <span className="mobility-stat-title">Geometría de Obstáculos</span>
+                          <span className="mobility-stat-value" style={{ fontSize: "11px" }}>{mobility.obstacle_geometry_description}</span>
+                          <span style={{ fontSize: "9px", color: "#9398b0" }}>Objetivo: {mobility.analog_target_name}</span>
+                        </div>
+                      </div>
+
+                      <div className="test-protocol-box" style={{ marginTop: "14px", padding: "12px" }}>
+                        <strong>Protocolo de Interacción de Ruedas en Terreno:</strong>
+                        <p style={{ marginTop: "4px" }}>{mobility.wheel_interaction_protocol}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <div style={{ padding: "30px", textAlign: "center", color: "#8489a2" }}>
+                      Cargando terradinámica de movilidad…
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {activeCompareTab === "isru_habitat" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <section className="panel scorecard-panel">
+                    <div className="scorecard-header">
+                      <div>
+                        <div className="eyebrow"><span />RECURSOS IN-SITU Y PROCESAMIENTO H2O</div>
+                        <h2>Factibilidad ISRU (Extracción de Recursos In-Situ)</h2>
+                        <p style={{ fontSize: "10px", color: "#9ea3b9", marginTop: "4px" }}>
+                          Evaluación termoquímica de rendimiento hídrico, balance energético y viabilidad para soporte vital de bases permanentes.
+                        </p>
+                      </div>
+                      {isru && (
+                        <div className="scorecard-badges">
+                          <span className="fidelity-badge">
+                            Objetivo: {isru.target_feature_name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {isru ? (
+                      <>
+                        <div className="mobility-grid">
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Recurso Objetivo</span>
+                            <span className="mobility-stat-value" style={{ color: "#7fe4b1" }}>{isru.primary_resource}</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Cuerpo: {isru.target_body}</span>
+                          </div>
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Rendimiento Estimado</span>
+                            <span className="mobility-stat-value" style={{ fontSize: "11px" }}>{isru.estimated_water_yield}</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Vector hídrico</span>
+                          </div>
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Temperatura de Extracción</span>
+                            <span className="mobility-stat-value">{isru.thermal_extraction_temp_c} °C</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Energía térmica requerida</span>
+                          </div>
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Gasto Energético</span>
+                            <span className="mobility-stat-value">{isru.energy_requirement_kwh_per_kg} kWh/kg</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Por kg de agua extraída</span>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop: "14px", background: "#151827", padding: "14px", borderRadius: "6px", border: "1px solid #282e44" }}>
+                          <span style={{ fontSize: "9.5px", fontWeight: 700, color: "#d0b8ff", textTransform: "uppercase" }}>Aprovechamiento de Subproductos y Comparativa</span>
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "8px" }}>
+                            <div>
+                              <strong style={{ fontSize: "9.5px", color: "#e1e4f4" }}>Subproductos Útiles:</strong>
+                              <p style={{ fontSize: "9.5px", color: "#a5a9c0", marginTop: "2px" }}>{isru.byproducts_utilization}</p>
+                            </div>
+                            <div>
+                              <strong style={{ fontSize: "9.5px", color: "#f2cb78" }}>Frente a Trampas Frías (PSR):</strong>
+                              <p style={{ fontSize: "9.5px", color: "#a5a9c0", marginTop: "2px" }}>{isru.comparison_with_lunar_psr}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ padding: "30px", textAlign: "center", color: "#8489a2" }}>
+                        Cargando modelo de extracción ISRU…
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="panel scorecard-panel">
+                    <div className="scorecard-header">
+                      <div>
+                        <div className="eyebrow"><span />SUBSUELO Y PROTECCIÓN AMBIENTAL</div>
+                        <h2>Hábitat Subterráneo y Blindaje de Radiación</h2>
+                        <p style={{ fontSize: "10px", color: "#9ea3b9", marginTop: "4px" }}>
+                          Atenuación de rayos cósmicos galácticos (GCR) y amortiguamiento térmico para asentamientos humanos Artemis.
+                        </p>
+                      </div>
+                      {habitat && (
+                        <div className="scorecard-badges">
+                          <span className="fidelity-badge">Atenuación: {habitat.radiation_attenuation_factor}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {habitat ? (
+                      <>
+                        <div className="mobility-grid">
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Estructura Subterránea</span>
+                            <span className="mobility-stat-value" style={{ color: "#d0b8ff", fontSize: "11px" }}>{habitat.subsurface_structure_type}</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Cavidad protegida</span>
+                          </div>
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Temperatura Interior Constante</span>
+                            <span className="mobility-stat-value">{habitat.interior_constant_temp_c} °C</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Rango exterior: {habitat.exterior_temp_range_c}</span>
+                          </div>
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Factor Atenuación Radiación</span>
+                            <span className="mobility-stat-value" style={{ fontSize: "11px" }}>{habitat.radiation_attenuation_factor}</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>GCR y tormentas solares</span>
+                          </div>
+                          <div className="mobility-stat-card">
+                            <span className="mobility-stat-title">Análogo Para Sitio Lunar</span>
+                            <span className="mobility-stat-value" style={{ fontSize: "11px" }}>{habitat.analog_for_lunar_site}</span>
+                            <span style={{ fontSize: "9px", color: "#9398b0" }}>Marius Hills / Mare Tranquillitatis</span>
+                          </div>
+                        </div>
+
+                        <div style={{ marginTop: "14px", background: "#151827", padding: "14px", borderRadius: "6px", border: "1px solid #282e44" }}>
+                          <span style={{ fontSize: "9.5px", fontWeight: 700, color: "#7fe4b1", textTransform: "uppercase" }}>Anclaje de Hábitat Inflable</span>
+                          <p style={{ fontSize: "10px", color: "#d9dcf0", marginTop: "4px", lineHeight: "1.5" }}>
+                            {habitat.inflatable_habitat_anchoring_method}
+                          </p>
+                        </div>
+
+                        <div className="divergence-box" style={{ marginTop: "12px", padding: "10px" }}>
+                          <strong>Divergencia de Presión Atmosférica:</strong>
+                          <p style={{ marginTop: "2px" }}>{habitat.atmospheric_pressure_divergence}</p>
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ padding: "20px", background: "#161928", borderRadius: "6px", border: "1px solid #2b3149", color: "#a1a5be", fontSize: "10px", lineHeight: "1.5" }}>
+                        Cargando modelo de hábitat subterráneo…
+                      </div>
+                    )}
+                  </section>
+                </div>
               )}
             </>
           )}
@@ -784,6 +1126,131 @@ export function Exploration({
           <Icon name="arrow" size={16} />
         </Link>
       </dialog>
+
+      <dialog
+        ref={briefingDialogRef}
+        className="briefing-modal"
+        onClick={e => {
+          if (e.target === e.currentTarget) briefingDialogRef.current?.close();
+        }}
+        aria-labelledby="briefing-modal-title"
+      >
+        <div className="briefing-header">
+          <div>
+            <span className="eyebrow" style={{ color: "#9770ed" }}>NASA SPACE APPS CHALLENGE 2026 · TECHNICAL DOSSIER</span>
+            <h2 id="briefing-modal-title" style={{ fontSize: "18px", marginTop: "4px", color: "#f7f5fd" }}>
+              Dossier Técnico de Calificación de Misión
+            </h2>
+            <p style={{ fontSize: "10.5px", color: "#9ca1b8", marginTop: "2px" }}>
+              {selected.name} (Bolivia) ↔ {body === "Mars" ? "Marte (Terra Sirenum)" : "Luna (Polo Sur Lunar / Artemis)"}
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+            <button
+              type="button"
+              className="briefing-print-btn"
+              onClick={() => {
+                if (typeof window !== "undefined") window.print();
+              }}
+            >
+              <Icon name="download" size={13} />
+              Imprimir / PDF
+            </button>
+            <button
+              type="button"
+              className="icon-button"
+              aria-label="Cerrar dossier"
+              onClick={() => briefingDialogRef.current?.close()}
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px", maxHeight: "70vh", overflowY: "auto", paddingRight: "6px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "10px", background: "#151928", padding: "12px", borderRadius: "6px", border: "1px solid #2b3149", fontSize: "10px" }}>
+            <div>
+              <span style={{ color: "#878c9e", display: "block" }}>Región Terrestre:</span>
+              <strong style={{ color: "#ece8f6" }}>{selected.name}</strong>
+            </div>
+            <div>
+              <span style={{ color: "#878c9e", display: "block" }}>Cuerpo Objetivo:</span>
+              <strong style={{ color: "#ece8f6" }}>{body === "Mars" ? "Marte" : "Luna"}</strong>
+            </div>
+            <div>
+              <span style={{ color: "#878c9e", display: "block" }}>Fidelidad Global:</span>
+              <strong style={{ color: "#7fe4b1" }}>{scorecard?.overall_operational_fidelity ?? 4.5}/5</strong>
+            </div>
+            <div>
+              <span style={{ color: "#878c9e", display: "block" }}>TRL Estimado:</span>
+              <strong style={{ color: "#d0b8ff" }}>{scorecard?.trl_level ?? 6}/9</strong>
+            </div>
+            <div>
+              <span style={{ color: "#878c9e", display: "block" }}>Datum / CRS:</span>
+              <strong style={{ color: "#ece8f6" }}>{selected.crs_datum?.crs_name ?? "WGS84"}</strong>
+            </div>
+          </div>
+
+          <div style={{ background: "#161b2e", padding: "12px", borderRadius: "6px", borderLeft: "3px solid #7c58c9" }}>
+            <span style={{ fontSize: "9px", textTransform: "uppercase", color: "#b9a6ea", fontWeight: 700 }}>Justificación Operacional de Misión</span>
+            <p style={{ fontSize: "10.5px", color: "#e4e1f1", marginTop: "4px", lineHeight: "1.5" }}>
+              {scorecard?.primary_mission_role ?? "Evaluación de procesos geomorfológicos y terradinámicos análogos a sitios de exploración planetaria."}
+            </p>
+          </div>
+
+          <div>
+            <h3 style={{ fontSize: "12px", color: "#ece8f6", marginBottom: "8px" }}>Evaluación de las 7 Dimensiones NASA</h3>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "9.5px", color: "#c6cae0" }}>
+              <thead>
+                <tr style={{ background: "#1a1f33", textAlign: "left", color: "#9ca1b8", borderBottom: "1px solid #2f3652" }}>
+                  <th style={{ padding: "8px 6px" }}>Dimensión</th>
+                  <th style={{ padding: "8px 6px" }}>Fidelidad</th>
+                  <th style={{ padding: "8px 6px" }}>Alineación Funcional</th>
+                  <th style={{ padding: "8px 6px" }}>Divergencia Física</th>
+                </tr>
+              </thead>
+              <tbody>
+                {scorecard?.dimensions.map(d => (
+                  <tr key={d.dimension_name} style={{ borderBottom: "1px solid #1f2438" }}>
+                    <td style={{ padding: "8px 6px", fontWeight: 600, color: "#e8e5f5" }}>{d.dimension_name}</td>
+                    <td style={{ padding: "8px 6px", whiteSpace: "nowrap" }}>
+                      <span style={{ color: "#7fe4b1", fontWeight: 700 }}>{d.fidelity_score}/5</span>
+                    </td>
+                    <td style={{ padding: "8px 6px" }}>{d.analog_match_summary}</td>
+                    <td style={{ padding: "8px 6px", color: "#e8a88a" }}>{d.divergence_summary}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+            <div style={{ background: "#151928", padding: "12px", borderRadius: "6px", border: "1px solid #292f46" }}>
+              <span style={{ fontSize: "9px", textTransform: "uppercase", color: "#9bb7f7", fontWeight: 700 }}>Terradinámica & Tracción (Rover)</span>
+              <ul style={{ fontSize: "9px", color: "#bdc1d6", marginTop: "6px", paddingLeft: "14px", lineHeight: "1.6" }}>
+                <li>Plataforma: <strong>{mobility?.analog_rover_platform ?? "Rover de exploración"}</strong></li>
+                <li>Capacidad Portante: <strong>{mobility?.surface_bearing_capacity ?? "Media"}</strong></li>
+                <li>Riesgo de Derrape: <strong>{mobility?.traction_slip_risk ?? "moderado"}</strong></li>
+                <li>Pendiente Media: <strong>{mobility?.regional_avg_slope_deg ?? 0.5}°</strong></li>
+              </ul>
+            </div>
+            <div style={{ background: "#151928", padding: "12px", borderRadius: "6px", border: "1px solid #292f46" }}>
+              <span style={{ fontSize: "9px", textTransform: "uppercase", color: "#7fe4b1", fontWeight: 700 }}>ISRU & Recursos H2O</span>
+              <ul style={{ fontSize: "9px", color: "#bdc1d6", marginTop: "6px", paddingLeft: "14px", lineHeight: "1.6" }}>
+                <li>Recurso Objetivo: <strong>{isru?.primary_resource ?? "Minerales hidratados"}</strong></li>
+                <li>Rendimiento: <strong>{isru?.estimated_water_yield ?? "N/A"}</strong></li>
+                <li>Energía Extracción: <strong>{isru?.energy_requirement_kwh_per_kg ?? 0.72} kWh/kg H2O</strong></li>
+                <li>Aprovechamiento: <strong>{isru?.byproducts_utilization ?? "Material estructural"}</strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ background: "#1f1821", padding: "10px 12px", borderRadius: "4px", borderLeft: "3px solid #e08b6c", fontSize: "9px", color: "#e3bbb0", lineHeight: "1.5" }}>
+            <strong>Cláusula de Rigor Epistemológico NASA:</strong> Ningún análogo terrestre es idéntico a la Luna o Marte. Las pruebas de campo en este sitio calibran sistemas mecánicos y procesos termoquímicos, pero deben ser acopladas con cámaras de vacío térmico (TVAC) y simuladores de gravedad reducida (0.16g / 0.38g).
+          </div>
+        </div>
+      </dialog>
+    
     </main>
   );
 }

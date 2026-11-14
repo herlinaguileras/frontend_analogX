@@ -382,3 +382,44 @@ tbody tr { border-bottom: 1px solid #262837; }
 .nasa-trek-buttons { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 .nasa-trek-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 9.5px; padding: 7px 11px; border-radius: 4px; background: #1b2034; border: 1px solid #333c61; color: #9bb7f7; text-decoration: none; }
 .nasa-trek-btn:hover { background: #262e4a; color: #c2d5ff; border-color: #55679e; }
+
+/* Pestañas de Navegación de Misión */
+.compare-nav-tabs { display: flex; gap: 8px; margin-top: 18px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab-button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid #2b3046; background: #131622; color: #8d92ad; transition: all .2s; }
+.tab-button:hover { background: #1b1f30; color: #e1dcf2; border-color: #434a6d; }
+.tab-button.active { background: linear-gradient(105deg, #2b234a, #1d1833); border-color: #9770ed; color: #f2eefa; box-shadow: 0 0 12px #9770ed22; }
+
+/* Scorecard de Misión NASA */
+.scorecard-panel { padding: 22px 18px; margin-top: 14px; }
+.scorecard-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid #282d44; padding-bottom: 14px; }
+.scorecard-badges { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fidelity-badge { font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 5px; background: #153a2c; border: 1px solid #2c7257; color: #85d3b2; }
+.trl-badge { font-size: 10px; font-weight: 650; padding: 6px 10px; border-radius: 5px; background: #26223b; border: 1px solid #7c58c9; color: #d0b8ff; }
+.dimension-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; margin-top: 14px; }
+.dimension-card { background: #151827; border: 1px solid #282e44; border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.dimension-card-top { display: flex; justify-content: space-between; align-items: center; }
+.dimension-card-title { font-size: 11.5px; font-weight: 650; color: #e9e5f7; }
+.fidelity-meter { display: flex; gap: 4px; align-items: center; }
+.fidelity-dot { width: 7px; height: 7px; border-radius: 50%; background: #31374f; }
+.fidelity-dot.filled { background: #85d3b2; box-shadow: 0 0 5px #85d3b288; }
+.dimension-text { font-size: 9.5px; line-height: 1.5; color: #bcc0d6; }
+.dimension-text strong { color: #f0ecfc; }
+.divergence-box { background: #231d22; border-left: 2px solid #e08b6c; padding: 6px 8px; border-radius: 3px; font-size: 9px; color: #e8a88a; line-height: 1.4; }
+.test-protocol-box { background: #19202a; border-left: 2px solid #5aa5d9; padding: 6px 8px; border-radius: 3px; font-size: 9px; color: #9fd0f5; line-height: 1.4; }
+
+/* Movilidad & ISRU */
+.mobility-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin-top: 14px; }
+.mobility-stat-card { background: #151827; border: 1px solid #282e44; border-radius: 6px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.mobility-stat-title { font-size: 9px; font-weight: 600; text-transform: uppercase; color: #878c9e; }
+.mobility-stat-value { font-size: 13px; font-weight: 700; color: #f3effc; }
+.slip-risk-badge { display: inline-flex; padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; text-transform: uppercase; width: fit-content; }
+.slip-risk-badge.bajo { background: #163628; border: 1px solid #2f845d; color: #7fe4b1; }
+.slip-risk-badge.moderado { background: #3d321d; border: 1px solid #8e733b; color: #f2cb78; }
+.slip-risk-badge.alto { background: #3d231a; border: 1px solid #944b36; color: #f5967b; }
+.slip-risk-badge.critico { background: #4a191f; border: 1px solid #ab2d3e; color: #ff8595; }
+
+/* Modal de Briefing Imprimible */
+.briefing-modal { max-width: 760px; width: 95vw; background: #0f121c; border: 1px solid #3d4566; border-radius: 10px; color: #f0ecfa; padding: 28px 24px; box-shadow: 0 10px 40px #000000bb; }
+.briefing-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #9770ed; padding-bottom: 14px; margin-bottom: 18px; }
+.briefing-print-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; padding: 6px 12px; background: #26223b; border: 1px solid #7c58c9; border-radius: 4px; color: #e1d2ff; cursor: pointer; }
+.briefing-print-btn:hover { background: #372f57; }

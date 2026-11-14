@@ -245,3 +245,66 @@ export interface FindingItem {
   limitations_summary: string;
 }
 
+
+export interface DimensionEvaluation {
+  dimension_name: string;
+  dimension_key: string;
+  fidelity_score: number;
+  analog_match_summary: string;
+  divergence_summary: string;
+  applicable_test_protocol: string;
+  nasa_dataset_reference: string;
+}
+
+export interface MissionQualificationScorecard {
+  id: string;
+  earth_region_id: string;
+  earth_region_name: string;
+  planetary_target_id: string;
+  planetary_target_name: string;
+  target_mission_program: string;
+  overall_operational_fidelity: number;
+  trl_level: number;
+  primary_mission_role: string;
+  dimensions: DimensionEvaluation[];
+  epistemological_limitations: string[];
+  recommended_analog_campaign: string;
+}
+
+export interface RoverMobilityAnalysis {
+  earth_region_id: string;
+  earth_region_name: string;
+  analog_target_name: string;
+  surface_bearing_capacity: string;
+  max_safe_slope_deg: number;
+  regional_avg_slope_deg: number;
+  obstacle_geometry_description: string;
+  traction_slip_risk: "bajo" | "moderado" | "alto" | "critico";
+  wheel_interaction_protocol: string;
+  analog_rover_platform: string;
+}
+
+export interface IsruFeasibilityAnalysis {
+  earth_region_id: string;
+  earth_region_name: string;
+  target_body: "Moon" | "Mars";
+  target_feature_name: string;
+  primary_resource: string;
+  estimated_water_yield: string;
+  thermal_extraction_temp_c: number;
+  energy_requirement_kwh_per_kg: number;
+  byproducts_utilization: string;
+  comparison_with_lunar_psr: string;
+}
+
+export interface HabitatShieldingAnalysis {
+  earth_region_id: string;
+  earth_region_name: string;
+  subsurface_structure_type: string;
+  interior_constant_temp_c: number;
+  exterior_temp_range_c: string;
+  radiation_attenuation_factor: string;
+  atmospheric_pressure_divergence: string;
+  inflatable_habitat_anchoring_method: string;
+  analog_for_lunar_site: string;
+}
