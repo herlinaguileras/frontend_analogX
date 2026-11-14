@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "maplibre-gl/dist/maplibre-gl.css";
 
 @theme inline {
   --color-background: #0b0d15;
@@ -198,6 +197,17 @@ tbody tr { border-bottom: 1px solid #262837; }
 .provenance-note p { font-size: 11px; line-height: 1.9; color: #9890a6; margin-top: 10px; }
 .provenance-note .text-button { margin-top: 20px; }
 .compatibility-pending { color: #b8a784; border: 1px solid #4e4434; background: #29251c; padding: 4px 6px; border-radius: 3px; font-size: 8px; white-space: nowrap; }
+.compatibility-compatible { color: #8ee2b5; border: 1px solid #1e5c3e; background: #132e22; padding: 4px 6px; border-radius: 3px; font-size: 8px; white-space: nowrap; }
+.compatibility-requires_processing { color: #f0c375; border: 1px solid #6b4d1b; background: #35250c; padding: 4px 6px; border-radius: 3px; font-size: 8px; white-space: nowrap; }
+.compatibility-incompatible { color: #f78da7; border: 1px solid #6e273b; background: #33131c; padding: 4px 6px; border-radius: 3px; font-size: 8px; white-space: nowrap; }
+.active-dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; }
+.active-dot.verified { background: #52c41a; box-shadow: 0 0 6px #52c41a88; }
+.active-dot.evaluated { background: #1890ff; box-shadow: 0 0 6px #1890ff88; }
+.active-dot.datum { background: #722ed1; box-shadow: 0 0 6px #722ed188; }
+.active-dot.limitations { background: #faad14; box-shadow: 0 0 6px #faad1488; }
+.live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; color: #52c41a; background: #112a17; border: 1px solid #237804; padding: 2px 7px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.5px; }
+.live-badge::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: #52c41a; box-shadow: 0 0 4px #52c41a; }
+.obs-val { font-size: 9px; color: #d2c8de; display: block; max-width: 170px; line-height: 1.4; }
 .document-page { max-width: 1160px; padding: 64px 30px; margin: auto; }
 .document-page > h1 { font-size: clamp(36px, 5vw, 65px); font-weight: 500; letter-spacing: -2px; line-height: 1.12; margin-top: 20px; }
 .document-intro { color: #a19ab1; max-width: 610px; font-size: 15px; line-height: 1.9; margin-top: 23px; }
@@ -358,3 +368,17 @@ tbody tr { border-bottom: 1px solid #262837; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Utilidad de Misiones Espaciales (NASA Space Apps) */
+.mission-cases-panel { padding: 18px 16px; margin-top: 14px; }
+.mission-cases-list { display: flex; flex-direction: column; gap: 12px; margin-top: 12px; }
+.mission-card { background: #161928; border: 1px solid #2b3149; border-radius: 6px; padding: 12px 14px; }
+.mission-card-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.mission-card-title { font-size: 11px; font-weight: 650; color: #f0ecfc; }
+.mission-badge { font-size: 8px; font-weight: 600; text-transform: uppercase; padding: 3px 6px; border-radius: 3px; background: #643cac30; border: 1px solid #9770ed55; color: #c4a9f9; }
+.mission-badge.dimension { background: #1a3932; border-color: #3aa67b; color: #7de2b8; }
+.mission-card-desc { font-size: 9.5px; color: #b7b9cb; line-height: 1.5; margin-bottom: 6px; }
+.mission-card-meta { display: flex; gap: 12px; font-size: 8.5px; color: #82869f; flex-wrap: wrap; }
+.nasa-trek-buttons { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.nasa-trek-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 9.5px; padding: 7px 11px; border-radius: 4px; background: #1b2034; border: 1px solid #333c61; color: #9bb7f7; text-decoration: none; }
+.nasa-trek-btn:hover { background: #262e4a; color: #c2d5ff; border-color: #55679e; }

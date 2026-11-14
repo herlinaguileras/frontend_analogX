@@ -33,6 +33,20 @@ export const mapLocations: Partial<Record<string, MapLocation>> = {
     source_crs: "WGS84 / UTM 19S (EPSG:32719)",
     note: "Punto referencial del proyecto ENDE en Sol de Mañana; convertido de UTM 19S a WGS84 con Proj4. No delimita el campo geotérmico.",
   },
+  "cuevas-volcanicas-lipez": {
+    position: [-67.18, -22.27],
+    source_name: "AnalogX · Complejo Volcánico Uturuncu / Lípez",
+    source_url: "https://doi.org/10.1016/j.earscirev.2020.103288",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Sector de cavidades y tubos de lava relictos en el Altiplano Sur (~4400 msnm) para análogos de hábitats subterráneos lunares/marcianos.",
+  },
+  "cumbre-licancabur": {
+    position: [-67.88, -22.83],
+    source_name: "NASA Ames / SETI Institute Astrobiology Field Research",
+    source_url: "https://doi.org/10.1029/2006JG000318",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Cumbre criogénica y laguna de cráter volcánico (~5916 msnm); análogo extremo para pruebas de trajes espaciales EVA y frío polar.",
+  },
 };
 
 export const regionalView = { center: [-67.5, -21.2] as [number, number], zoom: 6.0 };

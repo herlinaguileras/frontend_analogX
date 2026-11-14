@@ -191,6 +191,28 @@ export interface VariableComparison {
   resampling: ResamplingRequirement;
   evidence_ids: string[];
   limitations: ScientificLimitation[];
+  earth_value?: string | null;
+  target_value?: string | null;
+}
+
+export type MissionCategory =
+  | "rover_mobility"
+  | "instrument_calibration"
+  | "base_habitat_shielding"
+  | "isru_resources"
+  | "sample_preservation";
+
+export interface MissionUseCase {
+  id: string;
+  title: string;
+  category: MissionCategory;
+  earth_region_id: string;
+  planetary_target_id: string;
+  applicable_mission: string;
+  description: string;
+  operational_method: string;
+  trl_readiness: number;
+  nasa_challenge_dimension: string;
 }
 
 /** Sin puntuación global: la compatibilidad se expresa por variable y evidencia. */
@@ -208,5 +230,18 @@ export interface ComparisonPayload {
   datasets: DatasetMetadata[];
   citations: BibliographicCitation[];
   limitations: ScientificLimitation[];
+  mission_use_cases?: MissionUseCase[];
   analogy_notice: AnalogyNotice;
 }
+
+export interface FindingItem {
+  id: string;
+  title: string;
+  summary: string;
+  evidence_count: number;
+  verification_status: VerificationStatus;
+  earth_region_name: string;
+  target_name: string;
+  limitations_summary: string;
+}
+

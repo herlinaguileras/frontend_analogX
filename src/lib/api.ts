@@ -1,15 +1,21 @@
-/** Contratos de transporte propuestos. No ejecuta solicitudes HTTP. */
+/**
+ * Cliente API y contratos de transporte para AnalogX.
+ * Conecta el frontend con el backend FastAPI (puerto 8000).
+ */
 import type {
   BibliographicCitation,
   ComparisonPayload,
   DatasetMetadata,
   EarthRegion,
+  FindingItem,
+  MissionUseCase,
   PlanetaryRegion,
   PlanetaryTarget,
   ScientificObservation,
   ScientificSource,
   VerificationStatus,
 } from "./scientific-types";
+import { studyRegions } from "./study-catalog";
 
 export interface ListResponse<T> {
   items: T[];
@@ -30,6 +36,7 @@ export interface RegionDetailResponse {
   datasets: DatasetMetadata[];
   sources: ScientificSource[];
   citations: BibliographicCitation[];
+  mission_use_cases?: MissionUseCase[];
 }
 
 export interface CompareRequest {
@@ -44,11 +51,160 @@ export interface ApiError {
   details: string[] | null;
 }
 
-/** Índice para acordar con backend; no registra endpoints en Next.js. */
+/** Índice de contratos acordado con backend. */
 export interface PlannedApiContract {
   "GET /api/regions": ListResponse<EarthRegion>;
   "GET /api/regions/{id}": RegionDetailResponse;
   "GET /api/targets": ListResponse<PlanetaryTarget>;
   "POST /api/compare": { request: CompareRequest; response: ComparisonPayload };
   "GET /api/sources": ListResponse<ScientificSource>;
+}
+
+export function getApiBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+  }
+  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+}
+
+export async function fetchRegions(filters?: Partial<RegionFilters>): Promise<ListResponse<EarthRegion>> {
+  const baseUrl = getApiBaseUrl();
+  const params = new URLSearchParams();
+  if (filters?.study_role && (filters.study_role as string) !== "all") params.set("study_role", filters.study_role);
+  if (filters?.country) params.set("country", filters.country);
+  if (filters?.verification_status) params.set("verification_status", filters.verification_status);
+  if (filters?.cursor) params.set("cursor", filters.cursor);
+
+  const query = params.toString() ? `?${params.toString()}` : "";
+  try {
+    const res = await fetch(`${baseUrl}/api/regions${query}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data: ListResponse<EarthRegion> = await res.json();
+    return data;
+  } catch {
+    // Fallback defensivo a regiones base para estabilidad si el backend no está activo
+    return { items: studyRegions, next_cursor: null };
+  }
+}
+
+export async function fetchRegionDetail(regionId: string): Promise<RegionDetailResponse | null> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(`${baseUrl}/api/regions/${encodeURIComponent(regionId)}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchTargets(body?: string): Promise<ListResponse<PlanetaryTarget>> {
+  const baseUrl = getApiBaseUrl();
+  const query = body ? `?body=${encodeURIComponent(body)}` : "";
+  try {
+    const res = await fetch(`${baseUrl}/api/targets${query}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return { items: [], next_cursor: null };
+  }
+}
+
+export async function fetchCompare(
+  earthRegionId: string,
+  planetaryTargetId: string
+): Promise<ComparisonPayload | null> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(`${baseUrl}/api/compare`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        earth_region_id: earthRegionId,
+        planetary_target_id: planetaryTargetId,
+      }),
+      signal: AbortSignal.timeout(5000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchSources(): Promise<ListResponse<ScientificSource>> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(`${baseUrl}/api/sources`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return { items: [], next_cursor: null };
+  }
+}
+
+export async function fetchFindings(): Promise<FindingItem[]> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(`${baseUrl}/api/findings`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+export async function checkBackendHealth(): Promise<{ status: string; online: boolean }> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(`${baseUrl}/health`, {
+      signal: AbortSignal.timeout(3000),
+      cache: "no-store",
+    });
+    if (!res.ok) return { status: "offline", online: false };
+    const data = await res.json();
+    return { status: data.status || "healthy", online: true };
+  } catch {
+    return { status: "offline", online: false };
+  }
+}
+
+export async function fetchMissionUseCases(category?: string): Promise<ListResponse<MissionUseCase>> {
+  const baseUrl = getApiBaseUrl();
+  const query = category ? `?category=${encodeURIComponent(category)}` : "";
+  try {
+    const res = await fetch(`${baseUrl}/api/missions/use-cases${query}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return { items: [], next_cursor: null };
+  }
 }

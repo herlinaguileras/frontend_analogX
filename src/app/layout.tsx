@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import "maplibre-gl/dist/maplibre-gl.css";
 import "./globals.css";
 import "./map-interface.css";
 import { SiteHeader } from "@/components/site-header";
