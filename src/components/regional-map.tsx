@@ -6,6 +6,10 @@ import { createMapStyle, formatLocation, mapLocations, regionalView, type Basema
 import type { EarthRegion } from "@/lib/scientific-types";
 import { Icon } from "./icon";
 
+if (typeof window !== "undefined") {
+  maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs");
+}
+
 export default function RegionalMap({ visibleRegions, selectedId, onSelect }: { visibleRegions: EarthRegion[]; selectedId: string; onSelect: (id: string) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
