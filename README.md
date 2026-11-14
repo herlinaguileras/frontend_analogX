@@ -28,14 +28,22 @@ npm run dev
 Abre `http://localhost:3000`. La ruta `/` redirige a `/explore`.
 
 - `/explore`: búsqueda por nombre, filtros por rol, selección de Marte/Luna,
-  esquema regional con zoom/capas y fichas de regiones.
+  mapa real con zoom/capas y fichas de regiones.
 - `/compare`: comparación por variable; acepta `region` y `body` en la URL.
 - `/methodology`: procedencia, compatibilidad, verificación y límites.
 - `/findings`: estado vacío hasta disponer de hallazgos verificados.
 
 Los nombres y roles de `src/lib/study-catalog.ts` proceden del brief inicial.
 Las regiones no contienen mediciones, coordenadas ni productos inventados.
-El esquema vectorial y los paisajes son ilustraciones, sin georreferenciación.
+El mapa utiliza MapLibre GL JS, Esri World Imagery y OpenStreetMap. Necesita
+conexión a Internet y WebGL; no requiere una clave para los servicios públicos
+configurados. Las atribuciones permanecen visibles en el mapa.
+Los localizadores de navegación están separados de los datos científicos:
+Uyuni referencia el catálogo USGS y Sol de Mañana utiliza una coordenada ENDE
+convertida con Proj4. El Altiplano Sur no tiene un marcador ni límites inventados.
+Las fuentes, las convenciones y la precisión se explican en `/methodology#cartography`.
+Las vistas previas terrestres usan teselas de contexto; los paisajes planetarios
+siguen siendo ilustraciones y no se presentan como productos científicos.
 Los filtros exploran el catálogo de estudio, no calculan similitud planetaria.
 No se realizan solicitudes a endpoints científicos todavía inexistentes.
 
@@ -49,6 +57,36 @@ Para verificar las rutas de producción, inicia `npm start -- --port 3100` y
 ejecuta `npm run test:smoke` en otra terminal. `ANALOGX_TEST_URL` permite usar
 otra dirección. Esta comprobación valida respuestas HTTP, redirección, selección
 por URL y estados pendientes; no sustituye la revisión visual en navegador.
+
+Para probar las interacciones de mapa, filtros, comparación y vista móvil:
+
+```sh
+npm run build
+npm run test:e2e
+```
+
+Playwright inicia y detiene su servidor de producción en el puerto 3100.
+En Windows usa Microsoft Edge instalado, en modo sin ventana. En otros sistemas,
+instala Chromium con `npx playwright install chromium`. Las capturas de escritorio
+y móvil se guardan en `test-results/` (excluido de Git). Una prueba adicional
+simula fallos del proveedor de teselas para comprobar la continuidad de la UI.
+
+## Cartografía
+
+`src/lib/map-config.ts` centraliza las fuentes, atribuciones y localizadores;
+`src/components/regional-map.tsx` gestiona la instancia MapLibre, cambios de capa,
+marcadores, controles, errores y liberación de recursos al navegar. El mapa se
+carga únicamente en el navegador, en un módulo separado del renderizado inicial.
+
+La capa satelital es un mosaico de contexto; su fecha y resolución no se
+presuponen. La cartografía no entra en los cálculos de comparación ni convierte
+una región en verificada. Los localizadores utilizan longitudes/latitudes para
+navegar, mientras la representación cartográfica es Web Mercator (EPSG:3857).
+El datum de las observaciones seguirá siendo el que documente el backend.
+
+Para un despliegue con tráfico significativo, revisar las condiciones y capacidad
+de los proveedores de teselas y configurar un servicio adecuado. Esta aplicación
+no hace descargas masivas ni ofrece almacenamiento sin conexión.
 
 ## Variables de entorno
 
@@ -79,4 +117,5 @@ no representan servicios disponibles ni un contrato Pydantic ya validado.
 Sustituir el catálogo inicial por respuestas validadas contra el esquema del
 backend, resolver datums/geometrías y conectar observaciones y citas. La
 comparación presenta datos pendientes hasta contar con evidencia; no calcula
-puntuaciones globales. No se han añadido MapLibre ni Recharts.
+puntuaciones globales. MapLibre está integrado para navegación cartográfica;
+Recharts y las comparaciones instrumentales siguen pendientes.

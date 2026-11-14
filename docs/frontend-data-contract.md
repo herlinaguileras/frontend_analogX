@@ -39,6 +39,41 @@ estado pendiente, sin valores sustitutos ni puntuaciones. Metodología presenta
 las reglas de interfaz y hallazgos mantiene un estado vacío. No se han añadido
 llamadas HTTP, bibliografía ficticia, MapLibre ni Recharts.
 
+### Actualización: mapa geográfico real
+
+El esquema inicial se reemplazó por MapLibre GL JS, con teselas raster de Esri
+World Imagery y OpenStreetMap. Ahora existen solicitudes cartográficas externas,
+sin modificar los contratos ni ejecutar llamadas a los endpoints científicos.
+Las atribuciones son visibles y las fuentes se explican en Metodología.
+
+`src/lib/map-config.ts` conserva los localizadores en un modelo independiente de
+`PlanetaryRegion`. No se han rellenado `geometry`, `approximate_coordinates`,
+`crs_datum` ni observaciones científicas con información del mapa base.
+
+- Uyuni: punto del catálogo [USGS EROS Cal/Val](https://calval.cr.usgs.gov/apps/uyuni-salt-flats),
+  20,38° S, 66,95° O. Es referencia de navegación del sitio de calibración,
+  no centro del salar. WGS84 es una convención asumida de visualización;
+  el datum de origen no está declarado en la página y debe confirmarse para análisis.
+- Sol de Mañana: punto referencial del proyecto ENDE, documento 2021, p. 5,
+  X 629577,24 e Y 7518040,45 m, UTM WGS84 zona 19K. Se interpreta la banda
+  sur como EPSG:32719 y Proj4 convierte a EPSG:4326. No delimita el campo geotérmico.
+- Altiplano Sur: no se inventa un punto ni un polígono. Al seleccionarlo se
+  restablece la vista regional y se indica que falta delimitar el área.
+
+Los puntos se usan exclusivamente para navegación con su procedencia y
+supuestos explícitos. Las geometrías científicas de datum desconocido siguen
+bloqueadas. Web Mercator (EPSG:3857) describe la presentación del mapa terrestre,
+no el datum de las observaciones ni una proyección válida para Marte/Luna.
+
+Las miniaturas terrestres muestran una tesela de contexto del mismo proveedor
+satelital. No se declaran fecha, resolución efectiva o producto instrumental.
+Los errores de red y la falta de WebGL muestran estados explícitos; las fichas,
+los filtros y la comparación permanecen disponibles sin cartografía.
+
+La cobertura actual se prueba con Playwright: selección mapa/listado, capas,
+filtros, parámetros de comparación, errores de teselas y ausencia de
+desbordamiento horizontal en escritorio y móvil.
+
 ## Fuente de verdad y serialización
 
 `src/lib/scientific-types.ts` define los modelos de dominio y `src/lib/api.ts`

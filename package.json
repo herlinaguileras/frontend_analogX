@@ -7,14 +7,18 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
-    "test:smoke": "node --env-file-if-exists=.env.local scripts/smoke-test.mjs"
+    "test:smoke": "node --env-file-if-exists=.env.local scripts/smoke-test.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "maplibre-gl": "6.18.0",
     "next": "16.4.6",
+    "proj4": "2.23.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "@tailwindcss/postcss": "4.3.5",
     "@types/node": "^24.0.0",
     "@types/react": "^19.0.0",
