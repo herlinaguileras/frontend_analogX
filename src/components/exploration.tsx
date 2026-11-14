@@ -247,29 +247,14 @@ export function Exploration({
           </p>
         </div>
         <div className="workspace-status">
-          <span />
-          {backendOnline ? <span className="live-badge">API CONECTADA</span> : "Espacio de investigación"}
-          <span className="status-divider">/</span>
-          Fase 1
-        </div>
-      </div>
-
-      <div className="exploration-toolbar">
-        <div>
-          <span className="toolbar-label">ESPACIO DE TRABAJO</span>
-          <span className="toolbar-current">
-            <Icon name={mode === "explore" ? "globe" : "compare"} size={15} />
-            {mode === "explore" ? "Explorador geográfico" : "Comparación científica"}
-          </span>
-        </div>
-        <div>
-          <span className="toolbar-stat">
-            <strong>{regionsList.length.toString().padStart(2, "0")}</strong> regiones de estudio
-          </span>
-          <span className="toolbar-separator" />
-          <span className="toolbar-scope">
-            <Icon name="layers" size={14} />
-            {backendOnline ? "Catálogo backend activo" : "Catálogo preliminar"}
+          {backendOnline ? (
+            <span className="live-badge">TELEMETRÍA EN VIVO (API FASTAPI)</span>
+          ) : (
+            <span className="live-badge" style={{ color: "#94a3b8" }}>CATÁLOGO CIENTÍFICO</span>
+          )}
+          <span className="status-divider">·</span>
+          <span style={{ fontSize: "9.5px", color: "#c084fc", fontWeight: 700, letterSpacing: "1px" }}>
+            NASA SPACE APPS 2026
           </span>
         </div>
       </div>

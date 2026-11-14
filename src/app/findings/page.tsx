@@ -15,7 +15,7 @@ export default async function FindingsPage() {
 
       {findings && findings.length > 0 && (
         <section className="panel" style={{ marginTop: "32px", padding: "28px" }}>
-          <div className="eyebrow">EVIDENCIA CONSOLIDADA · FASE 0 / FASE 1</div>
+          <div className="eyebrow">EVIDENCIA CONSOLIDADA · NASA SPACE APPS 2026</div>
           <h2 style={{ fontSize: "22px", marginTop: "8px", marginBottom: "16px" }}>
             Hallazgos Preliminares de Auditoría Científica (Backend)
           </h2>
