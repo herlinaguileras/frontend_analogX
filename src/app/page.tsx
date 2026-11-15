@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AsciiGlobe } from "@/components/ascii-globe";
 import { Icon } from "@/components/icon";
+import { MissionPortalCards } from "@/components/mission-portal-cards";
 
 export default function HomePage() {
   return (
@@ -78,87 +79,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="landing-portals-grid">
-          {/* TARJETA 1: LA LUNA */}
-          <div className="landing-portal-card moon-theme">
-            <div className="card-topline">
-              <span className="mission-badge moon-badge">PROGRAMA ARTEMIS</span>
-              <span className="card-code">MOON-TRK // POLO SUR</span>
-            </div>
-
-            <div className="card-title-row">
-              <span className="card-icon">🌕</span>
-              <div>
-                <h3>La Luna</h3>
-                <span className="card-subtitle">Permanent Moon Base Locations &amp; Cryogenic Traps</span>
-              </div>
-            </div>
-
-            <p className="card-desc">
-              Evaluación de sitios candidatos para la Base Lunar Permanente del Programa Artemis, refugios subterráneos contra tormentas solares y trampas criogénicas de hielo de agua.
-            </p>
-
-            <div className="card-sites-list">
-              <div className="site-pill">
-                <strong>Cráter Shackleton:</strong> Hielo masivo a 40 K en sombras permanentes (PSR) y picos de luz (&gt;85%).
-              </div>
-              <div className="site-pill">
-                <strong>Marius Hills:</strong> Claraboya de 65 m y tubos de lava basálticos con &gt;95% de atenuación de radiación cósmica.
-              </div>
-              <div className="site-pill">
-                <strong>Mare Tranquillitatis:</strong> Llanuras basálticas ricas en ilmenita para extracción ISRU de oxígeno.
-              </div>
-            </div>
-
-            <div className="card-actions-row">
-              <Link href="/explore?body=Moon" className="portal-launch-btn moon-launch">
-                <span>ABRIR EXPLORADOR LUNAR</span>
-                <span>→</span>
-              </Link>
-              <span className="hint-text">Análogos: Lípez · Licancabur · McMurdo · Lanzarote</span>
-            </div>
-          </div>
-
-          {/* TARJETA 2: MARTE */}
-          <div className="landing-portal-card mars-theme">
-            <div className="card-topline">
-              <span className="mission-badge mars-badge">MARS 2026 // PERSEVERANCE</span>
-              <span className="card-code">MARS-TRK // ERIDANIA</span>
-            </div>
-
-            <div className="card-title-row">
-              <span className="card-icon">🪐</span>
-              <div>
-                <h3>Planeta Marte</h3>
-                <span className="card-subtitle">Landing Sites, Rover Terramechanics &amp; Chloride Basins</span>
-              </div>
-            </div>
-
-            <p className="card-desc">
-              Bancos de prueba para rovers (Curiosity, Perseverance, MSR), tracción en costras de sal, detección de biofirmas en arcillas y reactores ISRU para extracción térmica de agua.
-            </p>
-
-            <div className="card-sites-list">
-              <div className="site-pill">
-                <strong>Cráter Jezero:</strong> Paleolago con abanico deltaico rico en arcillas esmectíticas y carbonatos de biofirmas.
-              </div>
-              <div className="site-pill">
-                <strong>Cráter Gale (Mt. Sharp):</strong> Estratigrafía sedimentaria de sulfatos evaporíticos de desecación marciana.
-              </div>
-              <div className="site-pill">
-                <strong>Terra Sirenum:</strong> Cuencas de sales de cloruro para ensayos de adherencia y desgaste de ruedas metálicas.
-              </div>
-            </div>
-
-            <div className="card-actions-row">
-              <Link href="/explore?body=Mars" className="portal-launch-btn mars-launch">
-                <span>ABRIR EXPLORADOR MARCIANO</span>
-                <span>→</span>
-              </Link>
-              <span className="hint-text">Análogos: Uyuni · Sol de Mañana · Atacama · Haughton</span>
-            </div>
-          </div>
-        </div>
+        <MissionPortalCards />
       </section>
 
       {/* =========================================================================
@@ -265,10 +186,6 @@ export default function HomePage() {
               <span>Bases de Datos Auditadas</span>
               <strong>NASA · ESA · USGS</strong>
             </div>
-            <Link href="/explore" className="stats-explore-btn">
-              <span>VER MAPA SATELITAL COMPLETO</span>
-              <span>→</span>
-            </Link>
           </div>
         </div>
       </section>
