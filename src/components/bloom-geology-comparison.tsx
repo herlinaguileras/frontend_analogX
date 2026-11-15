@@ -96,14 +96,14 @@ export function BloomGeologyComparison({
             </span>
           )}
           <span style={{ fontSize: "0.8125rem", color: "#7fd579", fontWeight: 600 }}>
-            {analogs.length}{" "}
-            {analogs.length === 1
+            {analogs.length} de 15{" "}
+            {isMoon
               ? isEn
-                ? "qualified analog"
-                : "análogo calificado"
+                ? "analogs qualified for the Moon (Artemis)"
+                : "análogos calificados para la Luna (Artemis)"
               : isEn
-              ? "qualified analogs"
-              : "análogos calificados"}
+              ? "analogs qualified for Planet Mars"
+              : "análogos calificados para el Planeta Marte"}
           </span>
         </div>
 

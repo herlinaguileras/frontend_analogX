@@ -99,6 +99,7 @@ export function BloomExplorationView({
       {/* 2. Interactive 1:1 Dual-World Terrain Comparator (Split Scrubber) */}
       <div style={{ maxWidth: "1380px", margin: "0 auto", padding: "0 2rem" }}>
         <DualWorldComparator
+          targetBody={body}
           initialPresetId={body === "Mars" ? "jezero-atacama" : "shackleton-mcmurdo"}
           lang={lang}
         />

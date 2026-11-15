@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import type { SupportedLang } from "@/lib/translations";
 import { getClimateComparison } from "@/lib/climate-science-engine";
 
@@ -233,27 +233,170 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
       ],
     },
   },
+  {
+    id: "tranquillitatis-timanfaya",
+    label: "Tranquillitatis ↔ Timanfaya (Luna · 86.4%)",
+    body: "Moon",
+    fidelityIndex: 86.4,
+    verifiedPercent: 93,
+    spatialResolution: "8m",
+    earthRegionId: "parque-timanfaya",
+    planetaryTarget: {
+      name: "Mare Tranquillitatis (Llanura Basáltica)",
+      subtitle: "Lavas Ilmeníticas de Alto Titanio (Luna)",
+      coordinates: "8.5° N · 31.4° E",
+      instrument: "NASA LROC / Apollo 11 Compendium",
+      image: "/images/geology/moon-tranquillitatis.jpg",
+      featureTag: "High-Ti Basalt Regolith",
+    },
+    earthTwin: {
+      name: "Campos de Lava de Timanfaya (Lanzarote)",
+      subtitle: "Manto de Escorias y Lavas Vítreas (España)",
+      coordinates: "29.00° N · 13.73° O",
+      instrument: "ESA PANGAEA / Copernicus Sentinel-2",
+      image: "/images/geology/earth-lanzarote.jpg",
+      featureTag: "Pristine Basalt Scoria Fields",
+    },
+    rehearsalObjective: "Regolith Tractions & Lunar ISRU",
+    transect: {
+      maxSlope: "8.5°",
+      roughnessRms: "11.2 cm",
+      sinkageRisk: "Medio en arenas de escoria",
+      points: [
+        { dist: 0, spaceElev: 100, earthElev: 90 },
+        { dist: 1, spaceElev: 120, earthElev: 115 },
+        { dist: 2, spaceElev: 140, earthElev: 135 },
+        { dist: 3, spaceElev: 130, earthElev: 125 },
+        { dist: 4, spaceElev: 160, earthElev: 155 },
+        { dist: 5, spaceElev: 175, earthElev: 170 },
+      ],
+    },
+  },
+  {
+    id: "malapert-licancabur",
+    label: "Pico Malapert ↔ Licancabur (Luna · 87.2%)",
+    body: "Moon",
+    fidelityIndex: 87.2,
+    verifiedPercent: 90,
+    spatialResolution: "15m",
+    earthRegionId: "cumbre-licancabur",
+    planetaryTarget: {
+      name: "Pico Malapert PEL (Polo Sur Lunar)",
+      subtitle: "Punto de Cuasi-Eterna Luz y Frío Extremo (Luna)",
+      coordinates: "84.9° S · 12.9° E",
+      instrument: "NASA LRO LOLA Altimetry / LAMP",
+      image: "/images/geology/moon-shackleton.jpg",
+      featureTag: "Point of Eternal Light (PEL)",
+    },
+    earthTwin: {
+      name: "Cumbre Criogénica Licancabur (Bolivia)",
+      subtitle: "Cúspide Volcánica a 5,916 msnm con Frío Polar",
+      coordinates: "22.83° S · 67.88° O",
+      instrument: "NASA Ames / SETI Astrobiology Field Research",
+      image: "/images/geology/earth-licancabur.jpg",
+      featureTag: "5,916m Extreme UV & Cryogenic Summit",
+    },
+    rehearsalObjective: "Polar EVA Testing & Grazing Sunlight Solar Power",
+    transect: {
+      maxSlope: "24.0°",
+      roughnessRms: "16.4 cm",
+      sinkageRisk: "Bajo (Cresta rocosa criogénica)",
+      points: [
+        { dist: 0, spaceElev: 500, earthElev: 480 },
+        { dist: 1, spaceElev: 650, earthElev: 620 },
+        { dist: 2, spaceElev: 820, earthElev: 790 },
+        { dist: 3, spaceElev: 980, earthElev: 940 },
+        { dist: 4, spaceElev: 1100, earthElev: 1060 },
+        { dist: 5, spaceElev: 1250, earthElev: 1210 },
+      ],
+    },
+  },
+  {
+    id: "gusev-sol-manana",
+    label: "Cráter Gusev ↔ Sol de Mañana (Marte · 89.7%)",
+    body: "Mars",
+    fidelityIndex: 89.7,
+    verifiedPercent: 94,
+    spatialResolution: "10m",
+    earthRegionId: "sol-de-manana",
+    planetaryTarget: {
+      name: "Home Plate (Cráter Gusev, Marte)",
+      subtitle: "Depósitos de Sílice Opalina Hidrotermal Fósil",
+      coordinates: "14.6° S · 175.5° E",
+      instrument: "NASA MER Spirit Mini-TES / APXS",
+      image: "/images/geology/mars-gusev.jpg",
+      featureTag: ">90% Opaline Silica Nodules",
+    },
+    earthTwin: {
+      name: "Campo Geotérmico Sol de Mañana (Bolivia)",
+      subtitle: "Fumarolas y Barros Ácidos a 4,850 msnm",
+      coordinates: "22.27° S · 67.18° O",
+      instrument: "Copernicus Sentinel-2 / ASTER Global Emissivity",
+      image: "/images/geology/earth-sol-manana.jpg",
+      featureTag: "Active Boiling Acid Hydrothermal Sinter",
+    },
+    rehearsalObjective: "Hydrothermal Biosignatures & Acid Alteration",
+    transect: {
+      maxSlope: "9.2°",
+      roughnessRms: "7.8 cm",
+      sinkageRisk: "Alto en costras de lodo caliente",
+      points: [
+        { dist: 0, spaceElev: 150, earthElev: 140 },
+        { dist: 1, spaceElev: 180, earthElev: 175 },
+        { dist: 2, spaceElev: 220, earthElev: 210 },
+        { dist: 3, spaceElev: 260, earthElev: 250 },
+        { dist: 4, spaceElev: 310, earthElev: 300 },
+        { dist: 5, spaceElev: 340, earthElev: 330 },
+      ],
+    },
+  },
 ];
 
 interface DualWorldComparatorProps {
   initialPresetId?: string;
+  targetBody?: "Moon" | "Mars";
   lang?: SupportedLang;
 }
 
 export function DualWorldComparator({
-  initialPresetId = "jezero-atacama",
+  initialPresetId,
+  targetBody,
   lang = "es",
 }: DualWorldComparatorProps) {
   const isEn = lang === "en";
-  const [selectedPresetId, setSelectedPresetId] = useState<string>(initialPresetId);
+
+  // Filter presets strictly by targetBody if provided
+  const availablePresets = useMemo(() => {
+    if (targetBody) {
+      return DUAL_WORLD_PRESETS.filter((p) => p.body === targetBody);
+    }
+    return DUAL_WORLD_PRESETS;
+  }, [targetBody]);
+
+  // Default to appropriate preset based on body
+  const defaultPresetId = useMemo(() => {
+    if (initialPresetId && availablePresets.some((p) => p.id === initialPresetId)) {
+      return initialPresetId;
+    }
+    return availablePresets[0]?.id ?? DUAL_WORLD_PRESETS[0]!.id;
+  }, [initialPresetId, availablePresets]);
+
+  const [selectedPresetId, setSelectedPresetId] = useState<string>(defaultPresetId);
   const [activeTab, setActiveTab] = useState<"imagery" | "transect" | "climate">("imagery");
   const [splitPos, setSplitPos] = useState<number>(50);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  // If targetBody changes, reset to the first matching preset
+  useEffect(() => {
+    if (!availablePresets.some((p) => p.id === selectedPresetId)) {
+      setSelectedPresetId(availablePresets[0]?.id ?? DUAL_WORLD_PRESETS[0]!.id);
+    }
+  }, [availablePresets, selectedPresetId]);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentPreset =
-    DUAL_WORLD_PRESETS.find((p) => p.id === selectedPresetId) ?? DUAL_WORLD_PRESETS[0]!;
+    availablePresets.find((p) => p.id === selectedPresetId) ?? availablePresets[0] ?? DUAL_WORLD_PRESETS[0]!;
   const climateData = getClimateComparison(currentPreset.earthRegionId, currentPreset.body);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
@@ -287,7 +430,7 @@ export function DualWorldComparator({
       <div className="dual-comparator-header">
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", marginBottom: "0.35rem" }}>
-            <span className="dual-header-pill">
+            <span className={`dual-header-pill ${currentPreset.body === "Mars" ? "mars" : "moon"}`}>
               {currentPreset.body === "Mars" ? "MARS REFERENCE" : "LUNAR REFERENCE"}
             </span>
             <span
@@ -325,7 +468,7 @@ export function DualWorldComparator({
       <div className="dual-presets-bar">
         <span className="presets-label">{isEn ? "Calibrated Baselines:" : "Patrones Calibrados:"}</span>
         <div className="presets-scroll">
-          {DUAL_WORLD_PRESETS.map((preset) => {
+          {availablePresets.map((preset) => {
             const active = preset.id === selectedPresetId;
             return (
               <button

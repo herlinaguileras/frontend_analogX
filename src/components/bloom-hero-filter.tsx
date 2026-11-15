@@ -361,19 +361,36 @@ export function BloomHeroFilter({
           <div className="bloom-counter-row">
             <div>
               <span className="bloom-counter-dot" />
-              <strong>{matchCount}</strong>{" "}
-              {matchCount === 1
+              <strong>{matchCount} de 15</strong>{" "}
+              {isMoon
                 ? isEn
-                  ? "compatible analog found"
-                  : "análogo compatible encontrado"
+                  ? "analogs qualified for the Moon (Artemis)"
+                  : "análogos calificados para la Luna (Artemis)"
                 : isEn
-                ? "compatible analogs found"
-                : "análogos compatibles encontrados"}
+                ? "analogs qualified for Planet Mars"
+                : "análogos calificados para el Planeta Marte"}
             </div>
             <div style={{ fontFamily: "var(--font-mono, monospace)" }}>
               {isEn ? "Average fidelity:" : "Fidelidad promedio:"} <strong>{avgScore}%</strong>
             </div>
           </div>
+          <p
+            style={{
+              fontSize: "0.75rem",
+              color: "rgba(255, 255, 255, 0.65)",
+              margin: "0.2rem 0 0.75rem 0",
+              lineHeight: "1.4",
+              textAlign: "left",
+            }}
+          >
+            {isMoon
+              ? isEn
+                ? "ℹ Verified catalog: 8 of the 15 global Earth analogs meet strict lunar criteria (basaltic regolith, lava tubes, cryogenic volatiles, or impact craters). The other 7 are Mars-exclusive."
+                : "ℹ Catálogo verificado: 8 de los 15 análogos globales cumplen criterios estrictos lunares (regolito basáltico, tubos de lava, volátiles criogénicos o impactos). Los otros 7 son exclusivos de Marte."
+              : isEn
+              ? "ℹ Verified catalog: 12 of the 15 global Earth analogs meet Martian criteria (perchlorates, hydrothermal, paleolakes, or aeolian dunes)."
+              : "ℹ Catálogo verificado: 12 de los 15 análogos globales cumplen criterios marcianos (percloratos, hidrotermalismo, paleocuencas salinas o dunas eólicas)."}
+          </p>
 
           {/* Strong Primary Action Button */}
           <button type="button" className="bloom-cta-btn" onClick={onApplyFilters}>

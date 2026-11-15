@@ -5576,6 +5576,18 @@ tbody tr:hover {
   text-transform: uppercase;
 }
 
+.dual-header-pill.mars {
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.dual-header-pill.moon {
+  background: rgba(65, 65, 252, 0.2);
+  color: #8b8bfe;
+  border-color: rgba(65, 65, 252, 0.45);
+}
+
 .dual-comparator-title {
   font-size: 1.625rem;
   font-weight: 800;
