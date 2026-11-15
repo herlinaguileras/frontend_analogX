@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import { formatLocation, mapLocations, type BasemapId } from "@/lib/map-config";
 import { Icon } from "./icon";
-import { processFilters, type DetailedEarthRegionInfo, type EarthProcessCategory } from "@/lib/earth-catalog";
+import { processFilters, detailedEarthRegions, type DetailedEarthRegionInfo, type EarthProcessCategory } from "@/lib/earth-catalog";
 import { getCountryView, GLOBAL_VIEW } from "@/lib/world-countries";
+import { useLanguage } from "@/context/language-context";
 
 if (typeof window !== "undefined") {
   maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs");
@@ -59,6 +60,7 @@ function createEarth3DGlobeStyle(): maplibregl.StyleSpecification {
 interface EarthMapProps {
   visibleRegions: DetailedEarthRegionInfo[];
   selectedId: string;
+  focusRequestSeq?: number;
   activeProcess: EarthProcessCategory;
   countryFilter: string;
   onSelect: (id: string) => void;
@@ -67,6 +69,7 @@ interface EarthMapProps {
 export default function EarthMap({
   visibleRegions,
   selectedId,
+  focusRequestSeq = 0,
   activeProcess,
   countryFilter,
   onSelect,
@@ -75,10 +78,9 @@ export default function EarthMap({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const onSelectRef = useRef(onSelect);
-  const previousSelection = useRef(selectedId);
+  const lastHandledFocusSeq = useRef(0);
   const previousCountry = useRef(countryFilter);
   const basemapRef = useRef<ExtendedBasemapId>("satellite");
-  const lastActionRef = useRef<"country" | "region">("country");
 
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -168,9 +170,9 @@ export default function EarthMap({
     const map = mapRef.current;
     if (!map || !ready || previousCountry.current === countryFilter) return;
     previousCountry.current = countryFilter;
-    lastActionRef.current = "country";
 
     const targetView = getCountryView(countryFilter);
+    map.stop();
     map.flyTo({
       center: targetView.center,
       zoom: targetView.zoom,
@@ -209,8 +211,8 @@ export default function EarthMap({
       dot.style.boxShadow = `0 0 12px ${markerColor}`;
 
       el.append(pulseRing, dot);
-      el.addEventListener("click", () => {
-        lastActionRef.current = "region";
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
         onSelectRef.current(region.id);
       });
 
@@ -226,20 +228,17 @@ export default function EarthMap({
     }
   }, [visibleRegions, selectedId, ready, markerColor]);
 
-  // Vuelo hacia una región seleccionada específicamente
+  // Vuelo explícito hacia una región seleccionada (clic en tarjeta o marcador)
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !ready || previousSelection.current === selectedId) return;
-    previousSelection.current = selectedId;
-
-    // Si la acción fue por cambio de país, respetamos la vista del país
-    if (lastActionRef.current === "country") {
-      lastActionRef.current = "region";
+    if (!map || !ready || focusRequestSeq <= 0 || lastHandledFocusSeq.current === focusRequestSeq) {
       return;
     }
+    lastHandledFocusSeq.current = focusRequestSeq;
 
-    const targetRegion = visibleRegions.find(r => r.id === selectedId);
-    if (!targetRegion) return;
+    const targetRegion =
+      visibleRegions.find((r) => r.id === selectedId) ?? detailedEarthRegions[selectedId];
+    if (!targetRegion?.coordinatesRaw) return;
 
     const targetZooms: Record<string, number> = {
       "sol-de-manana": 10.5,
@@ -261,13 +260,16 @@ export default function EarthMap({
     };
     const targetZoom = targetZooms[selectedId] ?? 8.5;
 
+    map.stop();
     map.flyTo({
       center: targetRegion.coordinatesRaw,
       zoom: targetZoom,
+      bearing: 0,
+      pitch: 0,
       duration: 1500,
       essential: true,
     });
-  }, [selectedId, ready, visibleRegions]);
+  }, [selectedId, focusRequestSeq, ready, visibleRegions]);
 
   function switchBasemap(next: ExtendedBasemapId) {
     const map = mapRef.current;
@@ -291,10 +293,20 @@ export default function EarthMap({
     });
   }
 
+  const { lang } = useLanguage();
+  const isEn = lang === "en";
+
   const selectedRegion = visibleRegions.find(r => r.id === selectedId);
 
   return (
-    <div className="earth-map-container" aria-label="Visor 3D interactivo del planeta Tierra">
+    <div
+      className="earth-map-container"
+      aria-label={
+        isEn
+          ? "Interactive 3D viewer of planet Earth"
+          : "Visor 3D interactivo del planeta Tierra"
+      }
+    >
       {/* Esquinas técnicas HUD */}
       <div className="hud-corner top-left" />
       <div className="hud-corner top-right" />
@@ -309,8 +321,10 @@ export default function EarthMap({
         <div className="map-mission-tag">
           <span className="live-ping" style={{ backgroundColor: markerColor }} />
           <span>
-            GLOBO 3D SATELITAL ·{" "}
-            <strong>{visibleRegions.length} ANÁLOGOS AUDITADOS</strong>
+            {isEn ? "3D SATELLITE GLOBE · " : "GLOBO 3D SATELITAL · "}
+            <strong>
+              {visibleRegions.length} {isEn ? "AUDITED ANALOGS" : "ANÁLOGOS AUDITADOS"}
+            </strong>
           </span>
         </div>
 
@@ -321,7 +335,7 @@ export default function EarthMap({
             onClick={() => switchBasemap("satellite")}
           >
             <Icon name="globe" size={13} />
-            <span>Satélite 3D (Esri)</span>
+            <span>{isEn ? "3D Satellite (Esri)" : "Satélite 3D (Esri)"}</span>
           </button>
           <button
             type="button"
@@ -329,14 +343,14 @@ export default function EarthMap({
             onClick={() => switchBasemap("terrain")}
           >
             <Icon name="layers" size={13} />
-            <span>Relieve Sombreado</span>
+            <span>{isEn ? "Shaded Relief" : "Relieve Sombreado"}</span>
           </button>
           <button
             type="button"
             className={`layer-btn ${basemap === "cartographic" ? "active" : ""}`}
             onClick={() => switchBasemap("cartographic")}
           >
-            <span>Cartográfico</span>
+            <span>{isEn ? "Cartographic" : "Cartográfico"}</span>
           </button>
         </div>
       </div>
@@ -346,8 +360,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Acercar mapa"
-          title="Acercar zoom (+)"
+          aria-label={isEn ? "Zoom in" : "Acercar mapa"}
+          title={isEn ? "Zoom in (+)" : "Acercar zoom (+)"}
           onClick={() => {
             const map = mapRef.current;
             if (!map) return;
@@ -359,8 +373,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Alejar mapa"
-          title="Alejar zoom (−)"
+          aria-label={isEn ? "Zoom out" : "Alejar mapa"}
+          title={isEn ? "Zoom out (−)" : "Alejar zoom (−)"}
           onClick={() => {
             const map = mapRef.current;
             if (!map) return;
@@ -373,8 +387,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Recentrar vista orbital"
-          title="Recentrar vista del país / globo"
+          aria-label={isEn ? "Recenter orbital view" : "Recentrar vista orbital"}
+          title={isEn ? "Recenter country / globe view" : "Recentrar vista del país / globo"}
           onClick={resetView}
         >
           <Icon name="target" size={16} />
@@ -382,8 +396,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Orientar al norte"
-          title="Orientar brújula al Norte"
+          aria-label={isEn ? "Reset compass north" : "Orientar al norte"}
+          title={isEn ? "Reset compass North" : "Orientar brújula al Norte"}
           onClick={() => mapRef.current?.resetNorth({ duration: 500 })}
         >
           <span className="compass-icon">N↑</span>
@@ -393,11 +407,11 @@ export default function EarthMap({
       {/* Barra inferior de telemetría y coordenadas dinámicas */}
       <div className="earth-coords-bar">
         <div className="coords-item">
-          <span className="coords-label">COORDENADAS CURSOR:</span>
+          <span className="coords-label">{isEn ? "CURSOR COORDS:" : "COORDENADAS CURSOR:"}</span>
           <strong>
             {cursorCoords
-              ? `${Math.abs(cursorCoords.lat).toFixed(4)}° ${cursorCoords.lat < 0 ? "S" : "N"} · ${Math.abs(cursorCoords.lng).toFixed(4)}° ${cursorCoords.lng < 0 ? "O" : "E"}`
-              : "20.3800° S · 66.9500° O"}
+              ? `${Math.abs(cursorCoords.lat).toFixed(4)}° ${cursorCoords.lat < 0 ? "S" : "N"} · ${Math.abs(cursorCoords.lng).toFixed(4)}° ${cursorCoords.lng < 0 ? (isEn ? "W" : "O") : "E"}`
+              : isEn ? "20.3800° S · 66.9500° W" : "20.3800° S · 66.9500° O"}
           </strong>
         </div>
         <div className="coords-sep">|</div>
@@ -407,8 +421,8 @@ export default function EarthMap({
         </div>
         <div className="coords-sep">|</div>
         <div className="coords-item">
-          <span className="coords-label">PROYECCIÓN:</span>
-          <strong>GLOBO 3D ESFÉRICO (WGS84)</strong>
+          <span className="coords-label">{isEn ? "PROJECTION:" : "PROYECCIÓN:"}</span>
+          <strong>{isEn ? "3D SPHERICAL GLOBE (WGS84)" : "GLOBO 3D ESFÉRICO (WGS84)"}</strong>
         </div>
         {selectedRegion && (
           <>
@@ -423,7 +437,11 @@ export default function EarthMap({
       {loading && (
         <div className="earth-map-loading-overlay">
           <span className="loading-spinner" />
-          <span>Generando esfera 3D y cargando ortofotos satelitales…</span>
+          <span>
+            {isEn
+              ? "Rendering 3D sphere & loading satellite orthophotos…"
+              : "Generando esfera 3D y cargando ortofotos satelitales…"}
+          </span>
         </div>
       )}
     </div>

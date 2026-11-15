@@ -82,7 +82,7 @@ export function BloomOfficialReport({
         </div>
 
         <button type="button" onClick={handlePrint} className="bloom-print-btn">
-          <span>{isEn ? "🖨️ Export / Print Report" : "🖨️ Exportar / Imprimir Informe"}</span>
+          <span>{isEn ? "Export / Print Report" : "Exportar / Imprimir Informe"}</span>
         </button>
       </div>
 
@@ -172,8 +172,8 @@ export function BloomOfficialReport({
       >
         <h4 style={{ margin: 0, color: "#fff", fontSize: "1.0625rem" }}>
           {isEn
-            ? "💡 Challenge Justification: How does this analysis address the 'Surprise Us' Criterion?"
-            : "💡 Justificación del Reto: ¿Cómo este análisis responde al Criterio 'Surprise Us'?"}
+            ? "Challenge Justification: How does this analysis address the 'Surprise Us' Criterion?"
+            : "Justificación del Reto: ¿Cómo este análisis responde al Criterio 'Surprise Us'?"}
         </h4>
         <p style={{ margin: 0, fontSize: "0.875rem", lineHeight: "1.6", color: "rgba(255,255,255,0.8)" }}>
           {isEn ? (

@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/context/language-context";
 
 export function SiteHeader() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  const { lang, setLang, t } = useLanguage();
 
   return (
     <header className="site-header">
@@ -36,22 +38,45 @@ export function SiteHeader() {
         <div className="header-nav-center">
           <Link href="/" className="header-back-link">
             <span className="back-arrow">←</span>
-            <span>Volver al Inicio</span>
+            <span>{t("nav.back_home", "Volver al Inicio")}</span>
           </Link>
           {pathname === "/earth" && (
             <span className="header-body-badge earth-header-badge">
-              🌍 VISTA DE LA TIERRA 360°
+              {t("nav.earth_view", "VISTA DE LA TIERRA 360°")}
             </span>
           )}
         </div>
       )}
 
-      <div className="project-tag">
-        <span className="orbit-symbol">✦</span>
-        <span>
-          NASA SPACE APPS
-          <span className="project-year">PROYECTO · 2026</span>
-        </span>
+      <div className="header-actions-right">
+        {/* Persistent Global Bilingual Switcher */}
+        <div className="header-lang-switch" role="group" aria-label="Selector de idioma / Language selector">
+          <button
+            type="button"
+            className={`lang-pill-btn ${lang === "es" ? "active" : ""}`}
+            onClick={() => setLang("es")}
+            title="Español (ES)"
+          >
+            <span>ES</span>
+          </button>
+          <span className="lang-sep">|</span>
+          <button
+            type="button"
+            className={`lang-pill-btn ${lang === "en" ? "active" : ""}`}
+            onClick={() => setLang("en")}
+            title="English (EN)"
+          >
+            <span>EN</span>
+          </button>
+        </div>
+
+        <div className="project-tag">
+          <span className="orbit-symbol">✦</span>
+          <span>
+            {t("nav.nasa_badge", "NASA SPACE APPS")}
+            <span className="project-year">{t("nav.project_year", "PROYECTO · 2026")}</span>
+          </span>
+        </div>
       </div>
     </header>
   );

@@ -165,7 +165,7 @@ export function BloomGeologyComparison({
           {/* Left Column: Earth Geology */}
           <div className="bloom-geology-column liquid-glass">
             <span className="bloom-geology-tag earth">
-              {isEn ? "🌍 Earth Geology · " : "🌍 Geología Terrestre · "}
+              {isEn ? "Earth Geology · " : "Geología Terrestre · "}
               {item.name}
             </span>
 
@@ -197,11 +197,11 @@ export function BloomGeologyComparison({
             <span className="bloom-geology-tag space">
               {isMoon
                 ? isEn
-                  ? "🌕 Lunar Geology · "
-                  : "🌕 Geología Lunar · "
+                  ? "Lunar Geology · "
+                  : "Geología Lunar · "
                 : isEn
-                ? "🪐 Martian Geology · "
-                : "🪐 Geología Marciana · "}
+                ? "Martian Geology · "
+                : "Geología Marciana · "}
               {spaceTargetName}
             </span>
 
@@ -239,7 +239,7 @@ export function BloomGeologyComparison({
         <div className="bloom-climate-panel liquid-glass">
           <div className="bloom-climate-header">
             <div className="bloom-climate-badge">
-              <span>🌡️ {isEn ? "ATMOSPHERIC & CLIMATE ANALYSIS MATRIX" : "MATRIZ DE ANÁLISIS CLIMÁTICO Y ATMOSFÉRICO"}</span>
+              <span>{isEn ? "ATMOSPHERIC & CLIMATE ANALYSIS MATRIX" : "MATRIZ DE ANÁLISIS CLIMÁTICO Y ATMOSFÉRICO"}</span>
               <span className="fidelity-dot" />
               <span>{climateData.space.climateFidelityRating} {isEn ? "FIDELITY" : "COMPATIBILIDAD"}</span>
             </div>
@@ -254,17 +254,16 @@ export function BloomGeologyComparison({
             {/* 1. Thermal Extremes */}
             <div className="climate-quad-box">
               <div className="quad-label">
-                <span>🌡️</span>
                 <strong>{isEn ? "Thermal Regimes & Diurnal Swing" : "Régimen Térmico y Amplitud Día/Noche"}</strong>
               </div>
               <div className="quad-body">
                 <div className="quad-subrow earth">
-                  <span className="quad-target">🌍 {item.name}:</span>
+                  <span className="quad-target">{item.name}:</span>
                   <strong>{climateData.earth.tempRange}</strong>
                   <small>{climateData.earth.tempDayNight}</small>
                 </div>
                 <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
-                  <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"} ({climateData.space.targetName}):</span>
+                  <span className="quad-target">{isMoon ? (isEn ? "Moon" : "Luna") : (isEn ? "Mars" : "Marte")} ({climateData.space.targetName}):</span>
                   <strong>{climateData.space.tempRange}</strong>
                   <small>{climateData.space.tempDescription}</small>
                 </div>
@@ -274,17 +273,16 @@ export function BloomGeologyComparison({
             {/* 2. Atmospheric Pressure */}
             <div className="climate-quad-box">
               <div className="quad-label">
-                <span>💨</span>
                 <strong>{isEn ? "Barometric Pressure & Gas Density" : "Presión Barométrica y Densidad de Gas"}</strong>
               </div>
               <div className="quad-body">
                 <div className="quad-subrow earth">
-                  <span className="quad-target">🌍 {item.name}:</span>
+                  <span className="quad-target">{item.name}:</span>
                   <strong>{climateData.earth.atmosphericPressure}</strong>
                   <small>{climateData.earth.atmosphericDensity}</small>
                 </div>
                 <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
-                  <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"}:</span>
+                  <span className="quad-target">{isMoon ? (isEn ? "Moon" : "Luna") : (isEn ? "Mars" : "Marte")}:</span>
                   <strong>{climateData.space.atmosphericPressure}</strong>
                   <small>{climateData.space.pressureDescription}</small>
                 </div>
@@ -294,17 +292,16 @@ export function BloomGeologyComparison({
             {/* 3. Solar UV & Radiation */}
             <div className="climate-quad-box">
               <div className="quad-label">
-                <span>☀️</span>
                 <strong>{isEn ? "Solar UV Irradiance & Radiation" : "Radiación Solar Ultravioleta & Cósmica"}</strong>
               </div>
               <div className="quad-body">
                 <div className="quad-subrow earth">
-                  <span className="quad-target">🌍 {item.name}:</span>
+                  <span className="quad-target">{item.name}:</span>
                   <strong>{climateData.earth.uvIndex}</strong>
                   <small>{climateData.earth.solarInsolation}</small>
                 </div>
                 <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
-                  <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"}:</span>
+                  <span className="quad-target">{isMoon ? (isEn ? "Moon" : "Luna") : (isEn ? "Mars" : "Marte")}:</span>
                   <strong>{climateData.space.solarRadiationUv}</strong>
                   <small>{climateData.space.radiationDescription}</small>
                 </div>
@@ -314,16 +311,15 @@ export function BloomGeologyComparison({
             {/* 4. Aridity & Eolian Dynamics */}
             <div className="climate-quad-box">
               <div className="quad-label">
-                <span>🌪️</span>
                 <strong>{isEn ? "Relative Humidity & Aeolian Dynamics" : "Humedad Relativa y Dinámica Eólica"}</strong>
               </div>
               <div className="quad-body">
                 <div className="quad-subrow earth">
-                  <span className="quad-target">🌍 {item.name}:</span>
+                  <span className="quad-target">{item.name}:</span>
                   <strong>{climateData.earth.windDesiccation}</strong>
                 </div>
                 <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
-                  <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"}:</span>
+                  <span className="quad-target">{isMoon ? (isEn ? "Moon" : "Luna") : (isEn ? "Mars" : "Marte")}:</span>
                   <strong>{climateData.space.relativeHumidity}</strong>
                   <small>{climateData.space.windEolianDynamics}</small>
                 </div>
@@ -334,7 +330,7 @@ export function BloomGeologyComparison({
           {/* Scientific Divergence & Mitigation */}
           <div className="climate-divergence-box">
             <div className="divergence-tag">
-              <span>⚠️ {isEn ? "CRITICAL PHYSICAL LIMIT & MITIGATION PROTOCOL" : "LÍMITE FÍSICO CRÍTICO Y PROTOCOLO DE MITIGACIÓN"}</span>
+              <span>{isEn ? "CRITICAL PHYSICAL LIMIT & MITIGATION PROTOCOL" : "LÍMITE FÍSICO CRÍTICO Y PROTOCOLO DE MITIGACIÓN"}</span>
             </div>
             <div className="divergence-text">
               <p><strong>{isEn ? "Thermal & Atmospheric Delta: " : "Delta Térmico y Atmosférico: "}</strong>{climateData.scientificDivergence.thermalDivergence}</p>
@@ -369,8 +365,8 @@ export function BloomGeologyComparison({
             <div className="bloom-point-box solid">
               <h5>
                 {isEn
-                  ? "✓ Where the analogy is solid (Verifiable Processes)"
-                  : "✓ Dónde la analogía es sólida (Procesos Verificables)"}
+                  ? "Where the analogy is solid (Verifiable Processes)"
+                  : "Dónde la analogía es sólida (Procesos Verificables)"}
               </h5>
               <ul className="bloom-point-list">
                 {solidAnalogy.map((point, idx) => (
@@ -383,8 +379,8 @@ export function BloomGeologyComparison({
             <div className="bloom-point-box limits">
               <h5>
                 {isEn
-                  ? "⚠ Where the analogy fails (Scientific Limitations)"
-                  : "⚠ Dónde falla la analogía (Límites Científicos)"}
+                  ? "Where the analogy fails (Scientific Limitations)"
+                  : "Dónde falla la analogía (Límites Científicos)"}
               </h5>
               <ul className="bloom-point-list">
                 {analogyLimits.map((point, idx) => (
@@ -398,8 +394,8 @@ export function BloomGeologyComparison({
           <div className="bloom-point-box operational">
             <h5>
               {isEn
-                ? "🚀 Operational Value: How does it prepare real missions to Moon or Mars?"
-                : "🚀 Valor Operacional: ¿Cómo prepara misiones reales a la Luna o Marte?"}
+                ? "Operational Value: How does it prepare real missions to Moon or Mars?"
+                : "Valor Operacional: ¿Cómo prepara misiones reales a la Luna o Marte?"}
             </h5>
             <ul className="bloom-point-list">
               {operationalVal.map((point, idx) => (

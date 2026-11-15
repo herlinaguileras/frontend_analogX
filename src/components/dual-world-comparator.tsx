@@ -458,7 +458,7 @@ export function DualWorldComparator({
             <div className="metric-value-huge">{currentPreset.fidelityIndex.toFixed(1)}%</div>
           </div>
           <div className="dual-metric-subbadges">
-            <span className="subbadge-verified">✔ {currentPreset.verifiedPercent}% verified data</span>
+            <span className="subbadge-verified">{currentPreset.verifiedPercent}% verified data</span>
             <span className="subbadge-res">{currentPreset.spatialResolution} spatial resolution</span>
           </div>
         </div>
@@ -514,7 +514,7 @@ export function DualWorldComparator({
       {/* Sub-bar: Scrubber mode & Tabs */}
       <div className="dual-scrubber-topbar">
         <div className="scrubber-status">
-          <span className="scrubber-icon">⚡</span>
+          <span className="scrubber-icon">⇄</span>
           <strong>{isEn ? "Interactive 1:1 Surface Scrubber" : "Deslizador Interactivo de Superficie 1:1"}</strong>
           <span className="scrubber-pct">
             ({Math.round(splitPos)}% / {Math.round(100 - splitPos)}% split)
@@ -530,21 +530,21 @@ export function DualWorldComparator({
             className={`view-tab-btn ${activeTab === "imagery" ? "active" : ""}`}
             onClick={() => setActiveTab("imagery")}
           >
-            <span>📷 {isEn ? "Topographic Imagery" : "Imágenes Topográficas"}</span>
+            <span>{isEn ? "Topographic Imagery" : "Imágenes Topográficas"}</span>
           </button>
           <button
             type="button"
             className={`view-tab-btn ${activeTab === "transect" ? "active" : ""}`}
             onClick={() => setActiveTab("transect")}
           >
-            <span>📈 {isEn ? "Elevation Transect" : "Transecto Altimétrico"}</span>
+            <span>{isEn ? "Elevation Transect" : "Transecto Altimétrico"}</span>
           </button>
           <button
             type="button"
             className={`view-tab-btn ${activeTab === "climate" ? "active" : ""}`}
             onClick={() => setActiveTab("climate")}
           >
-            <span>🌡️ {isEn ? "Atmospheric & Climate Matrix" : "Matriz Climática y Atmosférica"}</span>
+            <span>{isEn ? "Atmospheric & Climate Matrix" : "Matriz Climática y Atmosférica"}</span>
           </button>
         </div>
       </div>
@@ -733,7 +733,7 @@ export function DualWorldComparator({
               </p>
             </div>
             <div className="dual-climate-fidelity-pill">
-              <span>⚡ {climateData.space.climateFidelityRating} {isEn ? "CLIMATE COMPATIBILITY" : "COMPATIBILIDAD CLIMÁTICA"}</span>
+              <span>{climateData.space.climateFidelityRating} {isEn ? "CLIMATE COMPATIBILITY" : "COMPATIBILIDAD CLIMÁTICA"}</span>
             </div>
           </div>
 
@@ -741,7 +741,11 @@ export function DualWorldComparator({
             {/* Space Column */}
             <div className={`dual-climate-col space ${currentPreset.body === "Mars" ? "mars" : ""}`}>
               <div className="col-header-tag">
-                <span>{currentPreset.body === "Mars" ? "🪐 ATMÓSFERA MARCIANA" : "🌕 EXOSFERA LUNAR"}</span>
+                <span>
+                  {currentPreset.body === "Mars"
+                    ? isEn ? "MARTIAN ATMOSPHERE" : "ATMÓSFERA MARCIANA"
+                    : isEn ? "LUNAR EXOSPHERE" : "EXOSFERA LUNAR"}
+                </span>
                 <small>{currentPreset.planetaryTarget.instrument}</small>
               </div>
 
@@ -775,7 +779,11 @@ export function DualWorldComparator({
             {/* Earth Twin Column */}
             <div className="dual-climate-col earth">
               <div className="col-header-tag">
-                <span>🌍 ANÁLOGO TERRESTRE ({currentPreset.earthTwin.name})</span>
+                <span>
+                  {isEn
+                    ? `EARTH ANALOG (${currentPreset.earthTwin.name})`
+                    : `ANÁLOGO TERRESTRE (${currentPreset.earthTwin.name})`}
+                </span>
                 <small>{currentPreset.earthTwin.instrument}</small>
               </div>
 
@@ -809,7 +817,7 @@ export function DualWorldComparator({
           {/* Operational Takeaway */}
           <div className="climate-divergence-box" style={{ marginTop: "0.5rem" }}>
             <div className="divergence-tag">
-              <span>⚡ {isEn ? "OPERATIONAL ATMOSPHERIC RATIONALE" : "JUSTIFICACIÓN OPERACIONAL ATMOSFÉRICA"}</span>
+              <span>{isEn ? "OPERATIONAL ATMOSPHERIC RATIONALE" : "JUSTIFICACIÓN OPERACIONAL ATMOSFÉRICA"}</span>
             </div>
             <div className="divergence-text">
               <p><strong>{isEn ? "Scientific Divergence: " : "Divergencia Científica: "}</strong>{climateData.scientificDivergence.thermalDivergence}</p>
