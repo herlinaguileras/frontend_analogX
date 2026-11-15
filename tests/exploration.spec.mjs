@@ -20,10 +20,10 @@ test("mapa real, selección, filtros y comparación", async ({ page }) => {
   await expect(page.locator(".map-context")).toContainText("OpenStreetMap");
   await page.getByRole("button", { name: "Satélite", exact: true }).click();
   await page.getByLabel("Rol en el estudio").selectOption("reference_calibration");
-  await expect(page.locator(".geographic-marker")).toHaveCount(1);
+  await expect(page.locator(".geographic-marker")).toHaveCount(5);
   await page.getByLabel("Rol en el estudio").selectOption("all");
   await page.getByRole("button", { name: /Altiplano Sur.*Candidato/ }).click();
-  await expect(page.locator(".map-location-strip")).toContainText("pendiente de delimitar");
+  await expect(page.locator(".map-location-strip")).toContainText("21.20° S");
   await page.getByLabel("Buscar región por nombre").fill("no-existe");
   await expect(page.getByText("No hay regiones con esos filtros.")).toBeVisible();
   await expect(page.locator(".geographic-marker")).toHaveCount(0);
@@ -36,7 +36,7 @@ test("mapa real, selección, filtros y comparación", async ({ page }) => {
   await page.getByRole("button", { name: "Luna", exact: true }).click();
   await page.getByRole("link", { name: "Abrir comparación" }).click();
   await expect(page).toHaveURL(/\/compare\?region=salar-de-uyuni&body=Moon/);
-  await expect(page.locator(".compare-pair")).toContainText("Objetivo por definir");
+  await expect(page.locator(".compare-pair")).toContainText("Polo Sur");
   expect(errors).toEqual([]);
 });
 

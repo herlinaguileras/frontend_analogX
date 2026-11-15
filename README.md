@@ -27,14 +27,19 @@ npm run dev
 
 Abre `http://localhost:3000`. La ruta `/` redirige a `/explore`.
 
-- `/explore`: búsqueda por nombre, filtros por rol, selección de Marte/Luna,
-  mapa real con zoom/capas y fichas de regiones.
-- `/compare`: comparación por variable; acepta `region` y `body` en la URL.
-- `/methodology`: procedencia, compatibilidad, verificación y límites.
-- `/findings`: estado vacío hasta disponer de hallazgos verificados.
+- `/explore`: búsqueda por nombre, filtros por rol y ámbito geográfico (Global y Altiplano),
+  selección de 6 destinos en Marte y la Luna, mapa mundial 360° con zoom/capas y fichas de regiones.
+- `/compare`: comparación por variable, terradinámica de rovers, balance ISRU de agua,
+  blindaje de hábitats, Scorecard de 7 Dimensiones NASA y Cláusula de Rigor Epistemológico.
+- `/methodology`: procedencia, compatibilidad, verificación y fuentes cartográficas globales.
+- `/findings`: bitácora científica con hallazgos preliminares y principios de trazabilidad.
 
-Los nombres y roles de `src/lib/study-catalog.ts` proceden del brief inicial.
-Las regiones no contienen mediciones, coordenadas ni productos inventados.
+El catálogo integra 9 regiones análogas: 5 de Bolivia (novedad científica y análogos emergentes)
+junto a 4 referencias canónicas globales (Atacama en Chile, Valles Secos de McMurdo en la Antártida,
+Cráter Haughton en Canadá y Tubos de Lava de Lanzarote en España).
+Los objetivos planetarios abarcan 6 sitios estratégicos: Terra Sirenum, Cráter Jezero (Perseverance)
+y Cráter Gale (Curiosity) en Marte; Polo Sur Lunar (Artemis / Shackleton), Fosa de Marius Hills
+(Skylight basáltico) y Mare Tranquillitatis en la Luna, con enlaces dinámicos a NASA Trek y LROC QuickMap.
 El mapa utiliza MapLibre GL JS, Esri World Imagery y OpenStreetMap. Necesita
 conexión a Internet y WebGL; no requiere una clave para los servicios públicos
 configurados. Las atribuciones permanecen visibles en el mapa.

@@ -43,10 +43,9 @@ export default function RegionalMap({ visibleRegions, selectedId, onSelect }: { 
         style: createMapStyle(),
         center: regionalView.center,
         zoom: regionalView.zoom,
-        minZoom: 3, maxZoom: 16,
-        maxBounds: [[-83, -35], [-48, 1]],
+        minZoom: 1.5, maxZoom: 18,
         attributionControl: false,
-        renderWorldCopies: false,
+        renderWorldCopies: true,
         cooperativeGestures: true,
         locale: {
           "CooperativeGesturesHandler.WindowsHelpText": "Usa Ctrl + rueda para acercar el mapa",
@@ -128,8 +127,20 @@ export default function RegionalMap({ visibleRegions, selectedId, onSelect }: { 
     previousSelection.current = selectedId;
     const location = mapLocations[selectedId];
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const targetZooms: Record<string, number> = {
+      "sol-de-manana": 10,
+      "tubos-lava-lanzarote": 10,
+      "cumbre-licancabur": 10,
+      "cuevas-volcanicas-lipez": 9,
+      "atacama-yungay": 8,
+      "haughton-crater": 8,
+      "salar-de-uyuni": 8,
+      "mcmurdo-dry-valleys": 7,
+      "altiplano-sur": 7,
+    };
+    const zoomLevel = targetZooms[selectedId] ?? 8;
     map.flyTo(location
-      ? { center: location.position, zoom: selectedId === "sol-de-manana" ? 10 : 8, duration: reduceMotion ? 0 : 1200 }
+      ? { center: location.position, zoom: zoomLevel, duration: reduceMotion ? 0 : 1200 }
       : { ...regionalView, duration: reduceMotion ? 0 : 800 });
   }, [selectedId, ready]);
 
@@ -151,11 +162,11 @@ export default function RegionalMap({ visibleRegions, selectedId, onSelect }: { 
 
   return <section className="regional-map live-map panel" aria-label="Mapa geográfico interactivo de las regiones de estudio">
     <div ref={containerRef} className="map-canvas" />
-    <div className="map-topbar"><div className="map-context"><span className="map-context-dot" /><span>ALTIPLANO BOLIVIANO<small>{basemap === "satellite" ? "Observación satelital de contexto" : "Cartografía OpenStreetMap"}</small></span></div><div className="basemap-switch" aria-label="Mapa base"><button aria-pressed={basemap === "satellite"} disabled={!ready} onClick={() => switchBasemap("satellite")}><Icon name="globe" size={13} />Satélite</button><button aria-pressed={basemap === "cartographic"} disabled={!ready} onClick={() => switchBasemap("cartographic")}>Cartográfico</button></div></div>
+    <div className="map-topbar"><div className="map-context"><span className="map-context-dot" /><span>EXPLORACIÓN GLOBAL DE ANÁLOGOS<small>{basemap === "satellite" ? "Observación satelital global de contexto (Esri)" : "Cartografía OpenStreetMap"}</small></span></div><div className="basemap-switch" aria-label="Mapa base"><button aria-pressed={basemap === "satellite"} disabled={!ready} onClick={() => switchBasemap("satellite")}><Icon name="globe" size={13} />Satélite</button><button aria-pressed={basemap === "cartographic"} disabled={!ready} onClick={() => switchBasemap("cartographic")}>Cartográfico</button></div></div>
     {loading && !unsupported && <div className="map-loading" role="status"><span className="loading-spinner" />Cargando cartografía…</div>}
     {unsupported && <div className="map-unavailable"><Icon name="globe" size={36} /><h2>El mapa necesita WebGL</h2><p>Activa la aceleración gráfica o abre la aplicación en un navegador compatible. Puedes seguir explorando las regiones en el panel lateral.</p><button className="primary-button" onClick={() => setAttempt(value => value + 1)}>Volver a intentar</button></div>}
     {problem && !unsupported && <div className="map-error" role="status"><Icon name="info" size={17} /><p>{problem}</p><button onClick={() => setAttempt(value => value + 1)}>Reintentar</button></div>}
-    <div className="live-map-controls"><button disabled={!ready || zoom >= 16} aria-label="Acercar mapa" onClick={() => mapRef.current?.zoomIn()}><span>+</span></button><button disabled={!ready || zoom <= 3} aria-label="Alejar mapa" onClick={() => mapRef.current?.zoomOut()}><span>−</span></button><div /><button disabled={!ready} aria-label="Ver toda la región" onClick={resetView}><Icon name="target" size={17} /></button><button disabled={!ready} aria-label="Configurar capas" aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}><Icon name="layers" size={17} /></button><button disabled={!ready} aria-label="Orientar al norte" onClick={() => mapRef.current?.resetNorth()}><span className="north-control">N<span>↑</span></span></button></div>
+    <div className="live-map-controls"><button disabled={!ready || zoom >= 18} aria-label="Acercar mapa" onClick={() => mapRef.current?.zoomIn()}><span>+</span></button><button disabled={!ready || zoom <= 1.5} aria-label="Alejar mapa" onClick={() => mapRef.current?.zoomOut()}><span>−</span></button><div /><button disabled={!ready} aria-label="Ver toda la región" onClick={resetView}><Icon name="target" size={17} /></button><button disabled={!ready} aria-label="Configurar capas" aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}><Icon name="layers" size={17} /></button><button disabled={!ready} aria-label="Orientar al norte" onClick={() => mapRef.current?.resetNorth()}><span className="north-control">N<span>↑</span></span></button></div>
     {layersOpen && <div className="live-layer-options"><div><strong>Capas visibles</strong><button aria-label="Cerrar capas" onClick={() => setLayersOpen(false)}><Icon name="close" size={14} /></button></div><label><input type="checkbox" checked={labels} onChange={event => setLabels(event.target.checked)} />Nombres de sitios</label><p>Los puntos son localizadores de referencia, no áreas de muestreo.</p><a href="/methodology#cartography">Fuentes y precisión<Icon name="arrow" size={12} /></a></div>}
     {!unsupported && <div className="map-location-strip"><Icon name="pin" size={15} /><div><strong>{selectedId === "altiplano-sur" ? "Altiplano Sur · vista regional" : visibleRegions.find(region => region.id === selectedId)?.name ?? "Selección fuera del filtro"}</strong><span>{selectedLocation ? formatLocation(selectedLocation.position) : "Área de estudio pendiente de delimitar"}</span></div>{selectedLocation && <a href={selectedLocation.source_url} target="_blank" rel="noopener noreferrer" title={selectedLocation.note}>{selectedLocation.source_name}<Icon name="arrow" size={12} /></a>}</div>}
     {missingLocations.length > 0 && !unsupported && <div className="map-area-note"><span />{missingLocations.map(region => region.name).join(", ")}: sin límite geográfico validado</div>}

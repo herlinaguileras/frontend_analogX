@@ -87,6 +87,154 @@ export const studyRegions: EarthRegion[] = [
     citation_ids: ["cit_risacher_1991"],
     limitations: [],
   },
+  {
+    id: "atacama-yungay",
+    name: "Desierto de Atacama (Yungay)",
+    body: "Earth",
+    study_role: "reference_calibration",
+    country: "Chile",
+    description: "Sector hiperárido de Yungay con precipitación menor a 1 mm/año. Suelos oxidantes con presencia de percloratos (ClO4-) y nitratos idénticos al regolito descubierto por Phoenix y Viking en Marte. Banco de pruebas canónico para bioseñales.",
+    geometry: null,
+    approximate_coordinates: [-69.87, -24.08],
+    crs_datum: null,
+    novelty_level: "reference_established",
+    novelty_justification: "Patrón internacional canónico de hiperaridez extrema y química oxidante de suelo marciano (Navarro-González et al., 2003).",
+    verification_status: "verificado_con_fuente",
+    dataset_ids: ["LANDSAT_8_9_OLI_TIRS_C2L2", "COP-DEM-GLO-30"],
+    citation_ids: ["cit_navarro_2003"],
+    limitations: [],
+  },
+  {
+    id: "mcmurdo-dry-valleys",
+    name: "Valles Secos de McMurdo (Beacon Valley)",
+    body: "Earth",
+    study_role: "reference_calibration",
+    country: "Antártida",
+    description: "Desierto frío polar hiperárido libre de nieve. Suelos periglaciares con cuñas de hielo poligonal y hielo masivo subsuperficial relicto (>8 Ma). Análogo para el regolito criogénico polar lunar y casquetes polares marcianos.",
+    geometry: null,
+    approximate_coordinates: [160.75, -77.85],
+    crs_datum: null,
+    novelty_level: "reference_established",
+    novelty_justification: "Referencia de la NASA y NSF para procesos de sublimación de hielo criogénico y perforación en trampas frías polares (Marchant et al., 2002).",
+    verification_status: "verificado_con_fuente",
+    dataset_ids: ["LRO_DIVINER_LST", "COP-DEM-GLO-30"],
+    citation_ids: ["cit_marchant_2002"],
+    limitations: [],
+  },
+  {
+    id: "haughton-crater",
+    name: "Cráter Haughton (Isla Devon)",
+    body: "Earth",
+    study_role: "reference_calibration",
+    country: "Canadá",
+    description: "Estructura de impacto meteórico de 23 km de diámetro en lecho rocoso carbonatado sobre permafrost continuo ártico. Sede del Haughton-Mars Project (HMP) de NASA para pruebas de trajes EVA, rovers tripulados y geología de eyección de impacto.",
+    geometry: null,
+    approximate_coordinates: [-89.67, 75.38],
+    crs_datum: null,
+    novelty_level: "reference_established",
+    novelty_justification: "Banco de pruebas oficial de la NASA para exploración humana de cráteres lunares y marcianos (Lee & Osinski, 2005).",
+    verification_status: "verificado_con_fuente",
+    dataset_ids: ["COP-DEM-GLO-30"],
+    citation_ids: ["cit_lee_2005"],
+    limitations: [],
+  },
+  {
+    id: "tubos-lava-lanzarote",
+    name: "Tubos de Lava y Cuevas de Malpaís (Lanzarote)",
+    body: "Earth",
+    study_role: "reference_calibration",
+    country: "España",
+    description: "Sistema de tubos volcánicos basálticos (Tubo de la Corona de 7.6 km). Utilizado oficialmente por la ESA en el programa de astronautas PANGAEA. Análogo estructural directo para la base permanente subterránea de Artemis en Marius Hills.",
+    geometry: null,
+    approximate_coordinates: [-13.48, 29.15],
+    crs_datum: null,
+    novelty_level: "reference_established",
+    novelty_justification: "Referencia canónica de la Agencia Espacial Europea (ESA) para exploración de cuevas planetarias y blindaje de radiación (Sauro et al., 2020).",
+    verification_status: "verificado_con_fuente",
+    dataset_ids: ["COP-DEM-GLO-30", "S2_MSI_L2A"],
+    citation_ids: ["cit_sauro_2020"],
+    limitations: [],
+  },
+];
+
+export interface PlanetaryTargetInfo {
+  id: string;
+  name: string;
+  body: "Mars" | "Moon";
+  subtitle: string;
+  coordinates: string;
+  geological_setting: string;
+  primary_mission_analog: string;
+  nasa_trek_url: string;
+  lroc_quickmap_url?: string;
+}
+
+export const planetaryTargets: PlanetaryTargetInfo[] = [
+  // Marte
+  {
+    id: "terra-sirenum",
+    name: "Terra Sirenum",
+    body: "Mars",
+    subtitle: "Cuencas de Cloruros y Paleolagos",
+    coordinates: "38.8° S · 139.0° O",
+    geological_setting: "Terrenos antiguos noéicos con depósitos masivos de cloruro y paleolagos salinos, análogo de desecación evaporítica.",
+    primary_mission_analog: "Salar de Uyuni / Desierto de Atacama",
+    nasa_trek_url: "https://trek.nasa.gov/mars/#v=0.1&x=-139.0&y=-38.8&z=5",
+  },
+  {
+    id: "mars-jezero-crater",
+    name: "Cráter Jezero",
+    body: "Mars",
+    subtitle: "Delta Fluvio-Lacustre · Mars 2020",
+    coordinates: "18.38° N · 77.58° E",
+    geological_setting: "Cuenca de impacto que albergó un lago perenne con abanico deltaico rico en arcillas esmectíticas, carbonatos y arenas. Sitio activo del rover Perseverance.",
+    primary_mission_analog: "Desierto de Atacama / Cráter Haughton",
+    nasa_trek_url: "https://trek.nasa.gov/mars/#v=0.1&x=77.58&y=18.38&z=6",
+  },
+  {
+    id: "mars-gale-crater",
+    name: "Cráter Gale y Monte Sharp",
+    body: "Mars",
+    subtitle: "Estratigrafía y Sulfatos · Curiosity",
+    coordinates: "5.40° S · 137.80° E",
+    geological_setting: "Estratigrafía sedimentaria de 5 km que registra la transición climática marciana desde lagos de agua dulce hasta capas masivas de sulfatos evaporíticos desérticos.",
+    primary_mission_analog: "Sol de Mañana / Altiplano Sur",
+    nasa_trek_url: "https://trek.nasa.gov/mars/#v=0.1&x=137.80&y=-5.40&z=6",
+  },
+  // Luna
+  {
+    id: "lunar-south-pole",
+    name: "Polo Sur Lunar (Shackleton)",
+    body: "Moon",
+    subtitle: "Campamento Base Artemis · PSRs",
+    coordinates: "89.9° S · 0.0° E",
+    geological_setting: "Cráter de impacto en el polo sur lunar con crestas iluminadas permanentemente y fondo en sombra perpetua (PSR) con volátiles y hielo de agua.",
+    primary_mission_analog: "Valles Secos de McMurdo / Licancabur",
+    nasa_trek_url: "https://trek.nasa.gov/moon/#v=0.1&x=0.0&y=-89.9&z=6",
+    lroc_quickmap_url: "https://quickmap.lroc.asu.edu/",
+  },
+  {
+    id: "moon-marius-hills",
+    name: "Fosa y Tubos de Marius Hills",
+    body: "Moon",
+    subtitle: "Skylight Volcánico · Hábitat Lunar",
+    coordinates: "14.10° N · 303.20° E (56.8° O)",
+    geological_setting: "Pozo de colapso de 65 m de diámetro y 80 m de profundidad en un canal de lava basáltico. Acceso confirmado a tubos de lava para bases subterráneas protegidas de radiación.",
+    primary_mission_analog: "Tubos de Lava de Lanzarote / Cuevas de Lípez",
+    nasa_trek_url: "https://trek.nasa.gov/moon/#v=0.1&x=-56.80&y=14.10&z=7",
+    lroc_quickmap_url: "https://quickmap.lroc.asu.edu/",
+  },
+  {
+    id: "moon-mare-tranquillitatis",
+    name: "Mare Tranquillitatis",
+    body: "Moon",
+    subtitle: "Fosa Profunda y Basalto Ilmenita",
+    coordinates: "8.50° N · 31.40° E",
+    geological_setting: "Llanura basáltica marina rica en ilmenita (FeTiO3) óptima para ISRU de oxígeno y titanio; con fosa basáltica profunda confirmada por radar Mini-RF de LRO en 2024.",
+    primary_mission_analog: "Tubos de Lava de Lanzarote / Uyuni",
+    nasa_trek_url: "https://trek.nasa.gov/moon/#v=0.1&x=31.40&y=8.50&z=6",
+    lroc_quickmap_url: "https://quickmap.lroc.asu.edu/",
+  },
 ];
 
 export const verificationLabels: Record<VerificationStatus, string> = {

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { comparisonVariables, studyRegions, verificationLabels } from "@/lib/study-catalog";
+import { comparisonVariables, planetaryTargets, studyRegions, verificationLabels, type PlanetaryTargetInfo } from "@/lib/study-catalog";
 import type { ComparisonPayload, EarthRegion, VerificationStatus } from "@/lib/scientific-types";
 import {
   fetchCompare,
@@ -152,6 +152,10 @@ export function Exploration({
   const [regionsList, setRegionsList] = useState<EarthRegion[]>(studyRegions);
   const [selectedId, setSelectedId] = useState(initialRegionId ?? studyRegions[0]!.id);
   const [body, setBody] = useState<"Mars" | "Moon">(initialBody);
+  const [selectedTargetId, setSelectedTargetId] = useState<string>(
+    initialBody === "Mars" ? "terra-sirenum" : "lunar-south-pole"
+  );
+  const [originFilter, setOriginFilter] = useState<"all" | "bolivia" | "global">("all");
   const [role, setRole] = useState("all");
   const [query, setQuery] = useState("");
   const [searched, setSearched] = useState(false);
@@ -160,7 +164,7 @@ export function Exploration({
   const [backendOnline, setBackendOnline] = useState<boolean>(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const briefingDialogRef = useRef<HTMLDialogElement>(null);
-  const [activeCompareTab, setActiveCompareTab] = useState<"variables" | "scorecard" | "mobility" | "isru_habitat">("variables");
+  const [activeCompareTab, setActiveCompareTab] = useState<"variables" | "scorecard" | "mobility" | "isru_habitat" | "epistemology">("variables");
   const [scorecard, setScorecard] = useState<MissionQualificationScorecard | null>(null);
   const [mobility, setMobility] = useState<RoverMobilityAnalysis | null>(null);
   const [isru, setIsru] = useState<IsruFeasibilityAnalysis | null>(null);
@@ -193,16 +197,15 @@ export function Exploration({
     };
   }, [selectedId]);
 
-  // Cargar payload de comparación cuando cambia la región o el cuerpo celeste
+  // Cargar payload de comparación cuando cambia la región o el objetivo planetario
   useEffect(() => {
     let isMounted = true;
-    const targetId = body === "Mars" ? "terra-sirenum" : "lunar-south-pole";
-    fetchCompare(selectedId, targetId).then(res => {
+    fetchCompare(selectedId, selectedTargetId).then(res => {
       if (isMounted && res) {
         setComparison(res);
       }
     });
-    fetchMissionScorecard(selectedId, targetId).then(res => {
+    fetchMissionScorecard(selectedId, selectedTargetId).then(res => {
       if (isMounted && res) setScorecard(res);
     });
     fetchRoverMobility(selectedId).then(res => {
@@ -217,19 +220,29 @@ export function Exploration({
     return () => {
       isMounted = false;
     };
-  }, [selectedId, body]);
+  }, [selectedId, selectedTargetId]);
+
+  const activeTarget =
+    planetaryTargets.find(t => t.id === selectedTargetId) ??
+    (body === "Mars" ? planetaryTargets[0]! : planetaryTargets[3]!);
 
   const selected = regionsList.find(r => r.id === selectedId) ?? regionsList[0]!;
   const selectedLocation = mapLocations[selected.id];
-  const visibleRegions = regionsList.filter(
-    r =>
-      (role === "all" || r.study_role === role) &&
-      r.name
-        .toLocaleLowerCase("es")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .includes(query.toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
-  );
+  const visibleRegions = regionsList.filter(r => {
+    const matchesRole = role === "all" || r.study_role === role;
+    const matchesOrigin =
+      originFilter === "all"
+        ? true
+        : originFilter === "bolivia"
+        ? r.country === "Bolivia"
+        : r.country !== "Bolivia";
+    const matchesQuery = r.name
+      .toLocaleLowerCase("es")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .includes(query.toLocaleLowerCase("es").normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+    return matchesRole && matchesOrigin && matchesQuery;
+  });
   const comparisonHref = `/compare?region=${encodeURIComponent(selected.id)}&body=${body}`;
 
   return (
@@ -237,13 +250,13 @@ export function Exploration({
       <div className="workspace-heading">
         <div>
           <div className="eyebrow">
-            <span />EXPLORACIÓN PLANETARIA <span className="eyebrow-divider">/</span> BOLIVIA
+            <span />EXPLORACIÓN PLANETARIA <span className="eyebrow-divider">/</span> CATÁLOGO GLOBAL & BOLIVIA
           </div>
           <h1>{mode === "compare" ? "Conecta mundos. Contrasta evidencia." : "Otros mundos empiezan en la Tierra."}</h1>
           <p>
             {mode === "compare"
               ? "Examina cada variable y comprende los límites de la analogía."
-              : "Explora regiones de Bolivia y su potencial para el estudio de análogos planetarios."}
+              : "Explora análogos de referencia global y la propuesta de novedad del Altiplano boliviano."}
           </p>
         </div>
         <div className="workspace-status">
@@ -275,7 +288,10 @@ export function Exploration({
                 <button
                   className={body === "Mars" ? "planet-option chosen mars" : "planet-option"}
                   aria-pressed={body === "Mars"}
-                  onClick={() => setBody("Mars")}
+                  onClick={() => {
+                    setBody("Mars");
+                    setSelectedTargetId("mars-jezero-crater");
+                  }}
                 >
                   <span className="planet-orb mars-orb" />
                   Marte{body === "Mars" && <Icon name="check" size={13} />}
@@ -283,12 +299,31 @@ export function Exploration({
                 <button
                   className={body === "Moon" ? "planet-option chosen" : "planet-option"}
                   aria-pressed={body === "Moon"}
-                  onClick={() => setBody("Moon")}
+                  onClick={() => {
+                    setBody("Moon");
+                    setSelectedTargetId("lunar-south-pole");
+                  }}
                 >
                   <span className="planet-orb moon-orb" />
                   Luna{body === "Moon" && <Icon name="check" size={13} />}
                 </button>
               </div>
+              <label className="select-label" htmlFor="target-select" style={{ marginTop: "10px" }}>
+                Sitio espacial ({body === "Mars" ? "Marte" : "Luna"})
+              </label>
+              <select
+                id="target-select"
+                value={selectedTargetId}
+                onChange={e => setSelectedTargetId(e.target.value)}
+              >
+                {planetaryTargets
+                  .filter(t => t.body === body)
+                  .map(t => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
             </fieldset>
 
             <fieldset>
@@ -307,6 +342,21 @@ export function Exploration({
                   placeholder="Buscar una región…"
                 />
               </label>
+              <label className="select-label" htmlFor="origin-scope">
+                Ámbito geográfico
+              </label>
+              <select
+                id="origin-scope"
+                value={originFilter}
+                onChange={e => {
+                  setOriginFilter(e.target.value as "all" | "bolivia" | "global");
+                  setSearched(false);
+                }}
+              >
+                <option value="all">Todas (Global & Altiplano)</option>
+                <option value="bolivia">Novedad Altiplánica (Bolivia)</option>
+                <option value="global">Patrones Globales (Chile, Antártida, Canadá, España)</option>
+              </select>
               <label className="select-label" htmlFor="study-role">
                 Rol en el estudio
               </label>
@@ -515,6 +565,14 @@ export function Exploration({
                 </button>
                 <button
                   type="button"
+                  className={`tab-button ${activeCompareTab === "epistemology" ? "active" : ""}`}
+                  onClick={() => setActiveCompareTab("epistemology")}
+                >
+                  <Icon name="info" size={14} />
+                  Rigor Epistemológico NASA
+                </button>
+                <button
+                  type="button"
                   className="tab-button"
                   style={{ marginLeft: "auto", borderColor: "#9770ed", color: "#d9c5fc" }}
                   onClick={() => briefingDialogRef.current?.showModal()}
@@ -531,11 +589,11 @@ export function Exploration({
                   {comparison?.mission_use_cases && comparison.mission_use_cases.length > 0 && (
                     <section className="panel mission-cases-panel">
                       <div className="panel-title">
-                        <h2>Utilidad Operacional para Misiones Espaciales (NASA Challenge)</h2>
+                        <h2>Utilidad Operacional para Misiones Espaciales ({activeTarget.name})</h2>
                         <span className="subtle-tag">NASA SPACE APPS 2026</span>
                       </div>
                       <p className="table-description">
-                        Justificación funcional de cómo este análogo terrestre ayuda a resolver desafíos de misiones reales (Artemis, rovers, hábitats e ISRU).
+                        Justificación funcional de cómo {selected.name} ayuda a validar tecnologías para {activeTarget.name} ({activeTarget.subtitle}).
                       </p>
                       <div className="mission-cases-list">
                         {comparison.mission_use_cases.map(useCase => (
@@ -555,40 +613,27 @@ export function Exploration({
                       </div>
 
                       <div className="nasa-trek-buttons">
-                        {body === "Mars" ? (
+                        <a
+                          href={activeTarget.nasa_trek_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="nasa-trek-btn"
+                        >
+                          <Icon name="explore" size={14} />
+                          Explorar {activeTarget.name} en NASA {body === "Mars" ? "Mars" : "Moon"} Trek
+                          <Icon name="arrow" size={12} />
+                        </a>
+                        {activeTarget.lroc_quickmap_url && (
                           <a
-                            href="https://trek.nasa.gov/mars/#v=0.1&x=-139.0&y=-38.8&z=5"
+                            href={activeTarget.lroc_quickmap_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="nasa-trek-btn"
                           >
-                            <Icon name="explore" size={14} />
-                            Explorar Terra Sirenum en NASA Mars Trek
+                            <Icon name="layers" size={14} />
+                            Ver capas en LROC QuickMap (LOLA / Diviner)
                             <Icon name="arrow" size={12} />
                           </a>
-                        ) : (
-                          <>
-                            <a
-                              href="https://trek.nasa.gov/moon/#v=0.1&x=0.0&y=-89.9&z=6"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="nasa-trek-btn"
-                            >
-                              <Icon name="explore" size={14} />
-                              Explorar Polo Sur Lunar en NASA Moon Trek
-                              <Icon name="arrow" size={12} />
-                            </a>
-                            <a
-                              href="https://quickmap.lroc.asu.edu/"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="nasa-trek-btn"
-                            >
-                              <Icon name="layers" size={14} />
-                              Ver capas en LROC QuickMap (LOLA / Diviner)
-                              <Icon name="arrow" size={12} />
-                            </a>
-                          </>
                         )}
                       </div>
                     </section>
@@ -856,6 +901,54 @@ export function Exploration({
                   </section>
                 </div>
               )}
+
+              {activeCompareTab === "epistemology" && (
+                <section className="panel scorecard-panel">
+                  <div className="scorecard-header">
+                    <div>
+                      <div className="eyebrow"><span />METODOLOGÍA CIENTÍFICA OFICIAL NASA</div>
+                      <h2>Cláusula de Rigor Epistemológico</h2>
+                      <p style={{ fontSize: "10px", color: "#9ea3b9", marginTop: "4px" }}>
+                        Delimitación estricta de qué propiedades de {activeTarget.name} pueden validarse en {selected.name} y cuáles exigen cámaras TVAC o misiones espaciales.
+                      </p>
+                    </div>
+                    <div className="scorecard-badges">
+                      <span className="fidelity-badge" style={{ background: "#271d3b", borderColor: "#7b52ab", color: "#cfbdf7" }}>
+                        Criterio Oficial NASA Space Apps
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "16px" }}>
+                    <div style={{ background: "#13211d", padding: "16px", borderRadius: "8px", border: "1px solid #1f4236" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                        <span style={{ background: "#1f6e52", color: "#fff", width: "22px", height: "22px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700 }}>✓</span>
+                        <h3 style={{ fontSize: "13px", color: "#85d3b2", margin: 0 }}>Lo que SÍ se puede validar en {selected.name}</h3>
+                      </div>
+                      <ul style={{ fontSize: "10.5px", color: "#d0f0e2", margin: 0, paddingLeft: "16px", lineHeight: "1.7" }}>
+                        <li><strong>Mecánica de tracción y grousers:</strong> Resistencia a la abrasión y derrape de ruedas metálicas en lechos poligonales, arenas y regolito rocoso.</li>
+                        <li><strong>Tolerancia de sellos y lubricantes:</strong> Penetración de polvo mineral fino en actuadores y juntas rotativas.</li>
+                        <li><strong>Espectrometría Raman / XRF / NIR:</strong> Relación señal/ruido y calibración cruzada de algoritmos de identificación mineral in situ.</li>
+                        <li><strong>Balance de energía ISRU:</strong> Destilación térmica de agua a partir de sales y minerales hidratados entre 120 °C y 180 °C.</li>
+                        <li><strong>Diseño de hábitats subterráneos:</strong> Bóvedas de roca basáltica/dacítica para blindaje pasivo y estabilidad térmica.</li>
+                      </ul>
+                    </div>
+
+                    <div style={{ background: "#23161c", padding: "16px", borderRadius: "8px", border: "1px solid #4a212f" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+                        <span style={{ background: "#8e2b45", color: "#fff", width: "22px", height: "22px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "12px", fontWeight: 700 }}>✗</span>
+                        <h3 style={{ fontSize: "13px", color: "#e899a8", margin: 0 }}>Lo que NO se puede simular (Exige TVAC / Vuelo)</h3>
+                      </div>
+                      <ul style={{ fontSize: "10.5px", color: "#f7d6dc", margin: 0, paddingLeft: "16px", lineHeight: "1.7" }}>
+                        <li><strong>Microgravedad planetaria:</strong> La Tierra (1.0g) no reproduce 0.16g (Luna) ni 0.38g (Marte); requiere vuelos parabólicos o simulación cinemática.</li>
+                        <li><strong>Vacío térmico extremo:</strong> El vacío lunar (10⁻¹² torr) o la baja presión marciana (6 hPa CO₂) exigen cámaras TVAC criogénicas.</li>
+                        <li><strong>Dosis acumulada de radiación cósmica:</strong> La magnetosfera terrestre bloquea los rayos cósmicos galácticos (GCR) y tormentas de partículas solares (SPE).</li>
+                        <li><strong>Meteorización espacial (Space Weathering):</strong> Bombardeo de micrometeoritos y pulverización catódica sin atenuación atmosférica.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </section>
+              )}
             </>
           )}
         </div>
@@ -871,7 +964,7 @@ export function Exploration({
                 <RegionPreview regionId={selected.id} />
                 <span>TIERRA</span>
                 <strong>{selected.name}</strong>
-                <small>Bolivia</small>
+                <small>{selected.country ?? "Tierra"}</small>
               </div>
               <span className="pair-symbol">
                 <Icon name="compare" size={15} />
@@ -879,8 +972,8 @@ export function Exploration({
               <div className="environment-card">
                 <TerrainArt variant={body === "Mars" ? "mars" : "moon"} />
                 <span>{body === "Mars" ? "MARTE" : "LUNA"}</span>
-                <strong>{body === "Mars" ? "Terra Sirenum" : "Por definir"}</strong>
-                <small>Objetivo propuesto</small>
+                <strong>{activeTarget.name}</strong>
+                <small>{activeTarget.subtitle}</small>
               </div>
             </div>
 
@@ -1127,7 +1220,7 @@ export function Exploration({
               Dossier Técnico de Calificación de Misión
             </h2>
             <p style={{ fontSize: "10.5px", color: "#9ca1b8", marginTop: "2px" }}>
-              {selected.name} (Bolivia) ↔ {body === "Mars" ? "Marte (Terra Sirenum)" : "Luna (Polo Sur Lunar / Artemis)"}
+              {selected.name} ({selected.country ?? "Tierra"}) ↔ {body === "Mars" ? "Marte" : "Luna"} ({activeTarget.name})
             </p>
           </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
@@ -1159,8 +1252,8 @@ export function Exploration({
               <strong style={{ color: "#ece8f6" }}>{selected.name}</strong>
             </div>
             <div>
-              <span style={{ color: "#878c9e", display: "block" }}>Cuerpo Objetivo:</span>
-              <strong style={{ color: "#ece8f6" }}>{body === "Mars" ? "Marte" : "Luna"}</strong>
+              <span style={{ color: "#878c9e", display: "block" }}>Destino Planetario:</span>
+              <strong style={{ color: "#ece8f6" }}>{activeTarget.name} ({body === "Mars" ? "Marte" : "Luna"})</strong>
             </div>
             <div>
               <span style={{ color: "#878c9e", display: "block" }}>Fidelidad Global:</span>
