@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icon";
 import { fetchFindings } from "@/lib/api";
+
+export const metadata: Metadata = {
+  title: "Hallazgos y Evidencias",
+  description: "Bitácora científica y evidencias consolidadas de auditoría científica.",
+};
 
 export default async function FindingsPage() {
   const findings = await fetchFindings();

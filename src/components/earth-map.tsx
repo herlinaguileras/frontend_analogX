@@ -16,7 +16,7 @@ export type ExtendedBasemapId = "satellite" | "cartographic" | "terrain";
 const basemapSources = {
   satellite: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   cartographic: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
-  terrain: "https://server.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}",
+  terrain: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
 };
 
 function createEarth3DGlobeStyle(): maplibregl.StyleSpecification {
@@ -43,8 +43,8 @@ function createEarth3DGlobeStyle(): maplibregl.StyleSpecification {
         type: "raster",
         tiles: [basemapSources.terrain],
         tileSize: 256,
-        maxzoom: 18,
-        attribution: '© Esri World Hillshade, USGS, CGIAR',
+        maxzoom: 13,
+        attribution: '© Esri World Shaded Relief, USGS, CGIAR',
       },
     },
     layers: [

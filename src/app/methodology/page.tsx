@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CartographySources } from "@/components/cartography-sources";
 import { Icon } from "@/components/icon";
 import { verificationLabels } from "@/lib/study-catalog";
+
+export const metadata: Metadata = {
+  title: "Metodología Científica",
+  description: "El método AnalogX: evidencia científica antes que la semejanza visual.",
+};
 
 export default function MethodologyPage() {
   return <main className="document-page"><div className="eyebrow">EL MÉTODO ANALOGX</div><h1>La evidencia antes<br />que la semejanza.</h1><p className="document-intro">Un paisaje parecido es un punto de partida. Una analogía científica necesita fuentes trazables, variables compatibles y límites explícitos.</p><div className="method-steps">{[

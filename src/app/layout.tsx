@@ -6,10 +6,14 @@ import "./map-interface.css";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
-  title: "AnalogX — Planetary Analog Discovery Engine",
+  title: {
+    default: "AnalogX — Planetary Analog Discovery Engine",
+    template: "AnalogX · %s",
+  },
   description: "Arquitectura de datos científicos para el estudio de análogos planetarios.",
   icons: {
     icon: [
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
       { url: "/icon.svg", type: "image/svg+xml" },
       { url: "/favicon.ico", sizes: "any" },
     ],

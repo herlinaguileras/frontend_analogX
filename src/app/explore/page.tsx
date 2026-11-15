@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { BloomExplorationView } from "@/components/bloom-exploration-view";
+
+export const metadata: Metadata = {
+  title: "Explorador Científico",
+  description: "Explora la correlación geológica, mineralógica y ambiental entre análogos terrestres y objetivos lunares o marcianos.",
+};
 
 export default async function ExplorePage({
   searchParams,
