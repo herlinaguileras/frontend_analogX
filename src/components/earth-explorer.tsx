@@ -13,6 +13,7 @@ import { regionPreviewUrl } from "@/lib/map-config";
 import { useLanguage } from "@/context/language-context";
 import { probeCoordinate, type ProbeEvaluateResponse } from "@/lib/api";
 import { CustomProbeDossier } from "./custom-probe-dossier";
+import { DualWorldComparator } from "./dual-world-comparator";
 import { Icon } from "./icon";
 import { CountryCombobox } from "./country-combobox";
 
@@ -40,7 +41,21 @@ export function EarthExplorer() {
   const [probeResult, setProbeResult] = useState<ProbeEvaluateResponse | null>(null);
   const [probeLoading, setProbeLoading] = useState<boolean>(false);
   const [activeProbeCoords, setActiveProbeCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [comparatorPreset, setComparatorPreset] = useState<string>("jezero-atacama");
   const viewportRef = useRef<HTMLElement>(null);
+
+  const mapTargetToPreset = (targetId: string): string => {
+    const t = targetId.toLowerCase();
+    if (t.includes("sirenum") || t.includes("uyuni")) return "sirenum-uyuni";
+    if (t.includes("shackleton") || t.includes("mcmurdo")) return "shackleton-mcmurdo";
+    if (t.includes("malapert") || t.includes("licancabur")) return "malapert-licancabur";
+    if (t.includes("marius") || t.includes("lanzarote")) return "marius-lanzarote";
+    if (t.includes("jezero") || t.includes("atacama")) return "jezero-atacama";
+    if (t.includes("gale") || t.includes("haughton")) return "gale-haughton";
+    if (t.includes("gusev") || t.includes("manana")) return "gusev-sol-manana";
+    if (t.includes("tranquillitatis") || t.includes("timanfaya")) return "tranquillitatis-timanfaya";
+    return "jezero-atacama";
+  };
 
   useEffect(() => {
     document.body.classList.toggle("printing-earth-report", reportModalOpen);
@@ -260,10 +275,14 @@ export function EarthExplorer() {
               setActiveProbeCoords(null);
             }}
             onOpenComparator={(targetId) => {
-              const compSection = document.getElementById("dual-world-comparator");
-              if (compSection) {
-                compSection.scrollIntoView({ behavior: "smooth" });
-              }
+              const preset = mapTargetToPreset(targetId);
+              setComparatorPreset(preset);
+              setTimeout(() => {
+                const compSection = document.getElementById("dual-world-comparator");
+                if (compSection) {
+                  compSection.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }, 50);
             }}
           />
         )}
@@ -519,6 +538,20 @@ export function EarthExplorer() {
             })}
           </div>
         )}
+      </section>
+
+      {/* =========================================================================
+          COMPARADOR DE TERRENO DE DOBLE MUNDO 1:1 (SPLIT SLIDER INTERACTIVO)
+          ========================================================================= */}
+      <section
+        id="dual-world-comparator"
+        className="dual-world-section"
+        style={{ maxWidth: "1400px", margin: "48px auto 32px", padding: "0 20px" }}
+      >
+        <DualWorldComparator
+          initialPresetId={comparatorPreset}
+          lang={lang}
+        />
       </section>
 
       {/* =========================================================================

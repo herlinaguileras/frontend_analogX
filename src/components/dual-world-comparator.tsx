@@ -386,6 +386,13 @@ export function DualWorldComparator({
   const [splitPos, setSplitPos] = useState<number>(50);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  // If initialPresetId changes from external trigger, update selection
+  useEffect(() => {
+    if (initialPresetId && availablePresets.some((p) => p.id === initialPresetId)) {
+      setSelectedPresetId(initialPresetId);
+    }
+  }, [initialPresetId, availablePresets]);
+
   // If targetBody changes, reset to the first matching preset
   useEffect(() => {
     if (!availablePresets.some((p) => p.id === selectedPresetId)) {
