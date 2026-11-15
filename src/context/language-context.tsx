@@ -15,7 +15,7 @@ const DICTIONARY: Record<SupportedLang, Record<string, string>> = {
   es: {
     // Header & Nav
     "nav.back_home": "Volver al Inicio",
-    "nav.earth_view": "🌍 VISTA DE LA TIERRA 360°",
+    "nav.earth_view": "VISTA DE LA TIERRA 360°",
     "nav.nasa_badge": "NASA SPACE APPS",
     "nav.project_year": "PROYECTO · 2026",
     "nav.skip": "Saltar al contenido",
@@ -24,7 +24,7 @@ const DICTIONARY: Record<SupportedLang, Record<string, string>> = {
     "home.badge": "NASA SPACE APPS CHALLENGE 2026 · RETO OFICIAL",
     "home.title": "Otros mundos empiezan en la Tierra.",
     "home.lead": "Motor analítico y de datos abiertos para identificar, caracterizar y comparar de forma verificable regiones terrestres que comparten procesos geológicos, físicos y térmicos con la Base Lunar Permanente Artemis y paleocuencas de Marte.",
-    "home.btn_earth": "🌍 VISTA DE LA TIERRA · EXPLORADOR SATELITAL 360°",
+    "home.btn_earth": "VISTA DE LA TIERRA · EXPLORADOR SATELITAL 360°",
     "home.btn_missions": "OBJETIVOS LUNA & MARTE ↓",
     "home.stat_analogs": "Análogos Terrestres",
     "home.stat_targets": "Objetivos Espaciales",
@@ -107,7 +107,7 @@ const DICTIONARY: Record<SupportedLang, Record<string, string>> = {
   en: {
     // Header & Nav
     "nav.back_home": "Back to Home",
-    "nav.earth_view": "🌍 360° EARTH VIEW",
+    "nav.earth_view": "360° EARTH VIEW",
     "nav.nasa_badge": "NASA SPACE APPS",
     "nav.project_year": "PROJECT · 2026",
     "nav.skip": "Skip to content",
@@ -116,7 +116,7 @@ const DICTIONARY: Record<SupportedLang, Record<string, string>> = {
     "home.badge": "NASA SPACE APPS CHALLENGE 2026 · OFFICIAL CHALLENGE",
     "home.title": "Other worlds begin on Earth.",
     "home.lead": "Open-data analytical engine to verifiably identify, characterize, and compare Earth regions that share geological, physical, and thermal processes with the Artemis Lunar Base and Mars paleobasins.",
-    "home.btn_earth": "🌍 3D EARTH VIEW · 360° SATELLITE EXPLORER",
+    "home.btn_earth": "3D EARTH VIEW · 360° SATELLITE EXPLORER",
     "home.btn_missions": "MOON & MARS TARGETS ↓",
     "home.stat_analogs": "Earth Analogs",
     "home.stat_targets": "Space Targets",

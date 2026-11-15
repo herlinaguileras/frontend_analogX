@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   allDetailedRegionsList,
@@ -30,10 +30,25 @@ export function EarthExplorer() {
   const isEn = lang === "en";
 
   const [selectedId, setSelectedId] = useState<string>("salar-de-uyuni");
+  const [focusRequestSeq, setFocusRequestSeq] = useState<number>(0);
   const [activeProcess, setActiveProcess] = useState<EarthProcessCategory>("all");
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [isCardCollapsed, setIsCardCollapsed] = useState<boolean>(false);
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
+  const viewportRef = useRef<HTMLElement>(null);
+
+  const handleFocusRegion = (regionId: string, scrollToGlobe = false) => {
+    setSelectedId(regionId);
+    setIsCardCollapsed(false);
+    setFocusRequestSeq((seq) => seq + 1);
+
+    if (scrollToGlobe && viewportRef.current) {
+      const rect = viewportRef.current.getBoundingClientRect();
+      if (rect.top < 16 || rect.bottom > window.innerHeight) {
+        viewportRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  };
 
   const getProcessLabel = (pId: string, short = false) => {
     if (!isEn) {
@@ -188,18 +203,16 @@ export function EarthExplorer() {
       {/* =========================================================================
           ÁREA PRINCIPAL: VISOR 3D DEL PLANETA TIERRA + FICHA TÉCNICA DETALLADA
           ========================================================================= */}
-      <section className="earth-viewport-section">
+      <section ref={viewportRef} className="earth-viewport-section">
         {/* Mapa 3D del Planeta Tierra (MapLibre 3D Globe) */}
         <div className="earth-map-wrapper">
           <EarthMap
             visibleRegions={visibleRegions}
             selectedId={activeRegion.id}
+            focusRequestSeq={focusRequestSeq}
             activeProcess={activeProcess}
             countryFilter={countryFilter}
-            onSelect={(id) => {
-              setSelectedId(id);
-              setIsCardCollapsed(false);
-            }}
+            onSelect={(id) => handleFocusRegion(id, false)}
           />
         </div>
 
@@ -433,10 +446,7 @@ export function EarthExplorer() {
                   key={region.id}
                   type="button"
                   className={`carousel-region-card ${isSelected ? "selected" : ""}`}
-                  onClick={() => {
-                    setSelectedId(region.id);
-                    setIsCardCollapsed(false);
-                  }}
+                  onClick={() => handleFocusRegion(region.id, true)}
                 >
                   <div className="carousel-card-top">
                     <span className="carousel-country">{region.country}</span>
@@ -583,7 +593,7 @@ export function EarthExplorer() {
                 className="modal-print-btn"
                 onClick={() => window.print()}
               >
-                {isEn ? "Print / Save PDF 🖨" : "Imprimir / Guardar PDF 🖨"}
+                {isEn ? "Print / Save PDF" : "Imprimir / Guardar PDF"}
               </button>
             </div>
           </div>

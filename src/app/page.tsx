@@ -40,7 +40,7 @@ export default function HomePage() {
 
             <div className="vana-hero-actions">
               <Link href="/earth" className="vana-btn-primary earth-launch-btn">
-                <span>{t("home.btn_earth", "🌍 VISTA DE LA TIERRA · EXPLORADOR SATELITAL 360°")}</span>
+                <span>{t("home.btn_earth", "VISTA DE LA TIERRA · EXPLORADOR SATELITAL 360°")}</span>
                 <span className="btn-arrow">→</span>
               </Link>
               <a href="#misiones" className="vana-btn-ghost">

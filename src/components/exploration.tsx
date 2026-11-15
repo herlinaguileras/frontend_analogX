@@ -454,7 +454,7 @@ export function Exploration({
           </section>
 
           <div className="sidebar-bottom">
-            <span className="country-mark">🇧🇴</span>
+            <span className="country-mark">BO</span>
             <span>
               Desde Bolivia,<br />
               <strong>hacia otros mundos.</strong>

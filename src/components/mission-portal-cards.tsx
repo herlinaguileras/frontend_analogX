@@ -7,7 +7,7 @@ import { useLanguage } from "@/context/language-context";
 
 export function MissionPortalCards() {
   const [hoveredPortal, setHoveredPortal] = useState<"moon" | "mars" | null>(null);
-  const { isEn, t, lang } = (() => {
+  const { isEn, t } = (() => {
     const ctx = useLanguage();
     return { ...ctx, isEn: ctx.lang === "en" };
   })();
@@ -17,7 +17,8 @@ export function MissionPortalCards() {
       {/* =========================================================================
           TARJETA 1: LA LUNA (PROGRAMA ARTEMIS)
           ========================================================================= */}
-      <div
+      <Link
+        href="/explore?body=Moon"
         className={`landing-portal-card moon-theme ${hoveredPortal === "moon" ? "card-hovered" : ""}`}
         onMouseEnter={() => setHoveredPortal("moon")}
         onMouseLeave={() => setHoveredPortal(null)}
@@ -48,18 +49,19 @@ export function MissionPortalCards() {
         </div>
 
         <div className="card-actions-row">
-          <Link href="/explore?body=Moon" className="portal-launch-btn moon-launch">
+          <span className="portal-launch-btn moon-launch">
             <span>{t("portals.moon_btn", "ABRIR EXPLORADOR LUNAR")}</span>
             <span className="launch-arrow">→</span>
-          </Link>
+          </span>
           <span className="hint-text">{t("portals.moon_analogs", "Análogos: Lípez · Licancabur · McMurdo · Lanzarote")}</span>
         </div>
-      </div>
+      </Link>
 
       {/* =========================================================================
           TARJETA 2: MARTE (MISIÓN PLANETARIA)
           ========================================================================= */}
-      <div
+      <Link
+        href="/explore?body=Mars"
         className={`landing-portal-card mars-theme ${hoveredPortal === "mars" ? "card-hovered" : ""}`}
         onMouseEnter={() => setHoveredPortal("mars")}
         onMouseLeave={() => setHoveredPortal(null)}
@@ -90,13 +92,13 @@ export function MissionPortalCards() {
         </div>
 
         <div className="card-actions-row">
-          <Link href="/explore?body=Mars" className="portal-launch-btn mars-launch">
+          <span className="portal-launch-btn mars-launch">
             <span>{t("portals.mars_btn", "ABRIR EXPLORADOR MARCIANO")}</span>
             <span className="launch-arrow">→</span>
-          </Link>
+          </span>
           <span className="hint-text">{t("portals.mars_analogs", "Análogos: Uyuni · Sol de Mañana · Atacama · Haughton")}</span>
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import * as maplibregl from "maplibre-gl";
 import { formatLocation, mapLocations, type BasemapId } from "@/lib/map-config";
 import { Icon } from "./icon";
-import { processFilters, type DetailedEarthRegionInfo, type EarthProcessCategory } from "@/lib/earth-catalog";
+import { processFilters, detailedEarthRegions, type DetailedEarthRegionInfo, type EarthProcessCategory } from "@/lib/earth-catalog";
 import { getCountryView, GLOBAL_VIEW } from "@/lib/world-countries";
 import { useLanguage } from "@/context/language-context";
 
@@ -60,6 +60,7 @@ function createEarth3DGlobeStyle(): maplibregl.StyleSpecification {
 interface EarthMapProps {
   visibleRegions: DetailedEarthRegionInfo[];
   selectedId: string;
+  focusRequestSeq?: number;
   activeProcess: EarthProcessCategory;
   countryFilter: string;
   onSelect: (id: string) => void;
@@ -68,6 +69,7 @@ interface EarthMapProps {
 export default function EarthMap({
   visibleRegions,
   selectedId,
+  focusRequestSeq = 0,
   activeProcess,
   countryFilter,
   onSelect,
@@ -76,10 +78,9 @@ export default function EarthMap({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
   const onSelectRef = useRef(onSelect);
-  const previousSelection = useRef(selectedId);
+  const lastHandledFocusSeq = useRef(0);
   const previousCountry = useRef(countryFilter);
   const basemapRef = useRef<ExtendedBasemapId>("satellite");
-  const lastActionRef = useRef<"country" | "region">("country");
 
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -126,15 +127,24 @@ export default function EarthMap({
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit: "metric" }), "bottom-left");
 
+    const loadTimeout = window.setTimeout(() => setLoading(false), 6000);
+
     map.on("style.load", () => {
-      setReady(true);
       map.setProjection({ type: "globe" });
+      setReady(true);
     });
     map.on("load", () => {
+      window.clearTimeout(loadTimeout);
       setLoading(false);
-      map.setProjection({ type: "globe" });
     });
-    map.on("idle", () => setLoading(false));
+    map.on("idle", () => {
+      window.clearTimeout(loadTimeout);
+      setLoading(false);
+    });
+    map.on("error", () => {
+      window.clearTimeout(loadTimeout);
+      setLoading(false);
+    });
     map.on("zoomend", () => setZoom(map.getZoom()));
 
     map.on("mousemove", (e) => {
@@ -145,6 +155,7 @@ export default function EarthMap({
     resize.observe(containerRef.current);
 
     return () => {
+      window.clearTimeout(loadTimeout);
       resize.disconnect();
       markersRef.current.forEach(m => m.remove());
       markersRef.current = [];
@@ -159,9 +170,9 @@ export default function EarthMap({
     const map = mapRef.current;
     if (!map || !ready || previousCountry.current === countryFilter) return;
     previousCountry.current = countryFilter;
-    lastActionRef.current = "country";
 
     const targetView = getCountryView(countryFilter);
+    map.stop();
     map.flyTo({
       center: targetView.center,
       zoom: targetView.zoom,
@@ -200,12 +211,16 @@ export default function EarthMap({
       dot.style.boxShadow = `0 0 12px ${markerColor}`;
 
       el.append(pulseRing, dot);
-      el.addEventListener("click", () => {
-        lastActionRef.current = "region";
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
         onSelectRef.current(region.id);
       });
 
-      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: "center",
+        opacityWhenCovered: "0",
+      })
         .setLngLat(position)
         .addTo(map);
 
@@ -213,20 +228,17 @@ export default function EarthMap({
     }
   }, [visibleRegions, selectedId, ready, markerColor]);
 
-  // Vuelo hacia una región seleccionada específicamente
+  // Vuelo explícito hacia una región seleccionada (clic en tarjeta o marcador)
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !ready || previousSelection.current === selectedId) return;
-    previousSelection.current = selectedId;
-
-    // Si la acción fue por cambio de país, respetamos la vista del país
-    if (lastActionRef.current === "country") {
-      lastActionRef.current = "region";
+    if (!map || !ready || focusRequestSeq <= 0 || lastHandledFocusSeq.current === focusRequestSeq) {
       return;
     }
+    lastHandledFocusSeq.current = focusRequestSeq;
 
-    const targetRegion = visibleRegions.find(r => r.id === selectedId);
-    if (!targetRegion) return;
+    const targetRegion =
+      visibleRegions.find((r) => r.id === selectedId) ?? detailedEarthRegions[selectedId];
+    if (!targetRegion?.coordinatesRaw) return;
 
     const targetZooms: Record<string, number> = {
       "sol-de-manana": 10.5,
@@ -248,13 +260,16 @@ export default function EarthMap({
     };
     const targetZoom = targetZooms[selectedId] ?? 8.5;
 
+    map.stop();
     map.flyTo({
       center: targetRegion.coordinatesRaw,
       zoom: targetZoom,
+      bearing: 0,
+      pitch: 0,
       duration: 1500,
       essential: true,
     });
-  }, [selectedId, ready, visibleRegions]);
+  }, [selectedId, focusRequestSeq, ready, visibleRegions]);
 
   function switchBasemap(next: ExtendedBasemapId) {
     const map = mapRef.current;

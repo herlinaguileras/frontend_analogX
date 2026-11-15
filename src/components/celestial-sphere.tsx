@@ -67,12 +67,6 @@ export function CelestialSphere({ body, size = 220, isHovered = false }: Celesti
         {/* Bisel interno de atmósfera y dispersión de luz (Fresnel rim) */}
         <div className={`celestial-fresnel-rim ${body}-rim`} />
       </div>
-
-      {/* Indicador de estado */}
-      <div className="celestial-status-indicator">
-        <span className="status-dot" />
-        <span className="status-text">{activeHover ? "Rotación 3D Activa" : "Pasa el cursor para girar"}</span>
-      </div>
     </div>
   );
 }

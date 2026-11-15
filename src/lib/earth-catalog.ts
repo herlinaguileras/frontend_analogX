@@ -120,7 +120,7 @@ export interface DetailedEarthRegionInfo {
 
 export const detailedEarthRegions: Record<string, DetailedEarthRegionInfo> = {
   // ==========================================
-  // 🇧🇴 BOLIVIA (8 SITIOS DE INVESTIGACIÓN)
+  // BOLIVIA (8 SITIOS DE INVESTIGACIÓN)
   // ==========================================
   "salar-de-uyuni": {
     id: "salar-de-uyuni",
@@ -523,7 +523,7 @@ export const detailedEarthRegions: Record<string, DetailedEarthRegionInfo> = {
   },
 
   // ==========================================
-  // 🇨🇱 CHILE (2 SITIOS)
+  // CHILE (2 SITIOS)
   // ==========================================
   "atacama-yungay": {
     id: "atacama-yungay",
@@ -626,7 +626,7 @@ export const detailedEarthRegions: Record<string, DetailedEarthRegionInfo> = {
   },
 
   // ==========================================
-  // 🇦🇶 ANTÁRTIDA (2 SITIOS)
+  // ANTÁRTIDA (2 SITIOS)
   // ==========================================
   "mcmurdo-dry-valleys": {
     id: "mcmurdo-dry-valleys",
@@ -729,7 +729,7 @@ export const detailedEarthRegions: Record<string, DetailedEarthRegionInfo> = {
   },
 
   // ==========================================
-  // 🇨🇦 CANADÁ (1 SITIO)
+  // CANADÁ (1 SITIO)
   // ==========================================
   "haughton-crater": {
     id: "haughton-crater",
@@ -782,7 +782,7 @@ export const detailedEarthRegions: Record<string, DetailedEarthRegionInfo> = {
   },
 
   // ==========================================
-  // 🇪🇸 ESPAÑA (2 SITIOS)
+  // ESPAÑA (2 SITIOS)
   // ==========================================
   "tubos-lava-lanzarote": {
     id: "tubos-lava-lanzarote",

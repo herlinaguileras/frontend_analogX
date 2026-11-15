@@ -42,7 +42,7 @@ export function SiteHeader() {
           </Link>
           {pathname === "/earth" && (
             <span className="header-body-badge earth-header-badge">
-              {t("nav.earth_view", "🌍 VISTA DE LA TIERRA 360°")}
+              {t("nav.earth_view", "VISTA DE LA TIERRA 360°")}
             </span>
           )}
         </div>

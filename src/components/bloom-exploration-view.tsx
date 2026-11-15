@@ -20,12 +20,30 @@ export function BloomExplorationView({
   // Body is strictly fixed to initialBody (to switch, user must return to home)
   const body: "Moon" | "Mars" = initialBody;
 
+  const initialMatchedRegion = initialRegionId
+    ? scienceDossierList.find(
+        (item) => item.id === initialRegionId && Boolean(getSpaceProfile(item, body))
+      )
+    : undefined;
+
   // Global synchronized language state
   const { lang, toggleLang } = useLanguage();
 
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [conditionFilter, setConditionFilter] = useState<string>("all");
   const [environmentFilter, setEnvironmentFilter] = useState<string>("all");
+  const [filtersApplied, setFiltersApplied] = useState<boolean>(Boolean(initialMatchedRegion));
+  const [selectedAnalogId, setSelectedAnalogId] = useState<string | null>(
+    initialMatchedRegion?.id ?? null
+  );
+
+  const hasActiveFilters =
+    roleFilter !== "all" || conditionFilter !== "all" || environmentFilter !== "all";
+  const showResults = filtersApplied || hasActiveFilters;
+
+  const bodyAnalogsCount = useMemo(() => {
+    return scienceDossierList.filter((item) => Boolean(getSpaceProfile(item, body))).length;
+  }, [body]);
 
   // Filter analogs based on selections
   const filteredAnalogs = useMemo(() => {
@@ -55,23 +73,48 @@ export function BloomExplorationView({
       .sort((a, b) => b.fidelityScore - a.fidelityScore);
   }, [body, roleFilter, conditionFilter, environmentFilter]);
 
+  // Show only one selected analog comparison at a time among filtered results
+  const activeAnalog = useMemo(() => {
+    if (!showResults || filteredAnalogs.length === 0) return null;
+    if (selectedAnalogId) {
+      const match = filteredAnalogs.find((item) => item.id === selectedAnalogId);
+      if (match) return match;
+    }
+    return filteredAnalogs[0] ?? null;
+  }, [showResults, filteredAnalogs, selectedAnalogId]);
+
   const avgScore = useMemo(() => {
     if (filteredAnalogs.length === 0) return 0;
     const sum = filteredAnalogs.reduce((acc, curr) => acc + curr.fidelityScore, 0);
     return Math.round(sum / filteredAnalogs.length);
   }, [filteredAnalogs]);
 
-  const handleApplyFilters = () => {
+  const scrollToComparison = () => {
     const el = document.getElementById("analisis-analogos");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  const handleApplyFilters = () => {
+    setFiltersApplied(true);
+    scrollToComparison();
+  };
+
+  const handleQuickFilter = (role: string) => {
+    setRoleFilter(role);
+    setConditionFilter("all");
+    setEnvironmentFilter("all");
+    setSelectedAnalogId(null);
+    setFiltersApplied(true);
+  };
+
   const handleResetFilters = () => {
     setRoleFilter("all");
     setConditionFilter("all");
     setEnvironmentFilter("all");
+    setFiltersApplied(false);
+    setSelectedAnalogId(null);
   };
 
   return (
@@ -80,11 +123,21 @@ export function BloomExplorationView({
       <BloomHeroFilter
         body={body}
         roleFilter={roleFilter}
-        onRoleFilterChange={setRoleFilter}
+        onRoleFilterChange={(val) => {
+          setRoleFilter(val);
+          setSelectedAnalogId(null);
+        }}
         conditionFilter={conditionFilter}
-        onConditionFilterChange={setConditionFilter}
+        onConditionFilterChange={(val) => {
+          setConditionFilter(val);
+          setSelectedAnalogId(null);
+        }}
         environmentFilter={environmentFilter}
-        onEnvironmentFilterChange={setEnvironmentFilter}
+        onEnvironmentFilterChange={(val) => {
+          setEnvironmentFilter(val);
+          setSelectedAnalogId(null);
+        }}
+        onQuickFilter={handleQuickFilter}
         matchCount={filteredAnalogs.length}
         avgScore={avgScore}
         onApplyFilters={handleApplyFilters}
@@ -101,9 +154,18 @@ export function BloomExplorationView({
         />
       </div>
 
-      {/* 3. Side-by-Side Geology Comparison & Deep Dive Scientific Analysis */}
+      {/* 3. Side-by-Side Geology & Climate Comparison (Filtered, One Analog at a Time) */}
       <BloomGeologyComparison
         analogs={filteredAnalogs}
+        activeAnalog={activeAnalog}
+        onSelectAnalog={setSelectedAnalogId}
+        hasAppliedFilters={showResults}
+        totalBodyCount={bodyAnalogsCount}
+        onApplyFilters={handleApplyFilters}
+        onQuickFilter={(role) => {
+          handleQuickFilter(role);
+          scrollToComparison();
+        }}
         body={body}
         roleFilter={roleFilter}
         conditionFilter={conditionFilter}
@@ -112,8 +174,19 @@ export function BloomExplorationView({
         lang={lang}
       />
 
-      {/* 3. Official NASA Space Apps Qualification Dossier & Printable Report */}
-      <BloomOfficialReport analogs={filteredAnalogs} body={body} lang={lang} />
+      {/* 3. Official NASA Space Apps Qualification Dossier & Printable Report (Only shown after filtering) */}
+      {showResults && filteredAnalogs.length > 0 && (
+        <BloomOfficialReport
+          analogs={filteredAnalogs}
+          activeAnalogId={activeAnalog?.id ?? null}
+          onSelectAnalog={(id) => {
+            setSelectedAnalogId(id);
+            scrollToComparison();
+          }}
+          body={body}
+          lang={lang}
+        />
+      )}
     </main>
   );
 }

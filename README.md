@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🪐 AnalogX — Planetary Analog Discovery Engine
+# AnalogX — Planetary Analog Discovery Engine
 
 **NASA Space Apps Challenge 2026 · Official Submission**  
 *Challenge: Identify Earth Locations that Analog Permanent Moon Base Locations and Mars*  
@@ -17,25 +17,25 @@
 
 ---
 
-## 🔗 Connected Repositories (Full-Stack Architecture)
+## Connected Repositories (Full-Stack Architecture)
 
 > [!IMPORTANT]
 > The NASA Space Apps Challenge submission portal allows submitting **one primary link**. This repository hosts the full interactive frontend client. The high-performance scientific backend API is publicly available at:
 
-* 🖥️ **Frontend Client (This Repository):**  
+* **Frontend Client (This Repository):**  
   [https://github.com/herlinaguileras/frontend_analogX](https://github.com/herlinaguileras/frontend_analogX)
-* ⚡ **Backend REST API & Scientific Database:**  
+* **Backend REST API & Scientific Database:**  
   [https://github.com/herlinaguileras/backend_analogX](https://github.com/herlinaguileras/backend_analogX)
 
 ---
 
-## 📖 Project Overview
+## Project Overview
 
 Preparing permanent human settlements on the Moon (**Artemis Base Camp**) and pioneering robotic/crewed missions to **Mars** demands rigorous terrestrial proving grounds. Historically, analog site selection has suffered from visual confirmation bias—assuming that a red landscape or a barren plain behaves like another planet without auditing physical and environmental parameters.
 
 **AnalogX** is an open-science planetary intelligence platform and comparative engine. It parametrically cross-examines **15 audited Earth analog environments** across 5 continents against **6 high-priority extraterrestrial destinations** on the Moon and Mars.
 
-### 🌟 Key Innovations & Features
+### Key Innovations & Features
 
 1. **360° 3D Spherical Earth Globe (`/earth`):**
    - High-fidelity spherical globe projection powered by MapLibre GL JS.
@@ -66,7 +66,7 @@ Preparing permanent human settlements on the Moon (**Artemis Base Camp**) and pi
 
 ---
 
-## 🏛️ Fullstack Architecture
+## Fullstack Architecture
 
 ```mermaid
 flowchart LR
@@ -98,7 +98,7 @@ flowchart LR
 
 ---
 
-## 🛰️ NASA & Partner Datasets Used
+## NASA & Partner Datasets Used
 
 | Resource | Mission / Instrument | Application in AnalogX | Link |
 | :--- | :--- | :--- | :--- |
@@ -111,7 +111,7 @@ flowchart LR
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 
 - **Frontend:** Next.js 16.4 (App Router), React 19, TypeScript (strict mode), MapLibre GL JS, Tailwind CSS, Turbopack.
 - **Backend:** Python 3.14, FastAPI, SQLModel, Uvicorn, SQLite3, Pydantic v2. ([View Backend Repo](https://github.com/herlinaguileras/backend_analogX))
@@ -120,7 +120,7 @@ flowchart LR
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 20+ or 22+
@@ -166,7 +166,7 @@ The backend REST API will be available at [http://localhost:8000/docs](http://lo
 
 ---
 
-## 👥 Team AstroCapis
+## Team AstroCapis
 
 - **Bernardo Chavez Padilla** — Full Stack Developer & System Architect
 - **Kelly Alisson Duran Marcelo** — UX/UI Lead & Product Designer
@@ -176,7 +176,7 @@ The backend REST API will be available at [http://localhost:8000/docs](http://lo
 
 ---
 
-## 📄 License
+## License
 
 This project is open-source and available under the [MIT License](LICENSE).
 NASA Space Apps Challenge 2026.

@@ -11,6 +11,7 @@ interface BloomHeroFilterProps {
   onConditionFilterChange: (val: string) => void;
   environmentFilter: string;
   onEnvironmentFilterChange: (val: string) => void;
+  onQuickFilter: (role: string) => void;
   matchCount: number;
   avgScore: number;
   onApplyFilters: () => void;
@@ -26,6 +27,7 @@ export function BloomHeroFilter({
   onConditionFilterChange,
   environmentFilter,
   onEnvironmentFilterChange,
+  onQuickFilter,
   matchCount,
   avgScore,
   onApplyFilters,
@@ -35,9 +37,8 @@ export function BloomHeroFilter({
   const isMoon = body === "Moon";
   const isEn = lang === "en";
 
-  const handleQuickTag = (role: string, condition?: string) => {
-    onRoleFilterChange(role);
-    if (condition) onConditionFilterChange(condition);
+  const handleQuickTag = (role: string) => {
+    onQuickFilter(role);
   };
 
   return (
@@ -121,7 +122,19 @@ export function BloomHeroFilter({
             }}
             title={isEn ? "Cambiar a Español" : "Translate to English"}
           >
-            <span style={{ fontSize: "1rem" }}>🌐</span>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <ellipse cx="12" cy="12" rx="4" ry="9" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+            </svg>
             <span
               style={{
                 fontFamily: "var(--font-mono, monospace)",
@@ -330,28 +343,28 @@ export function BloomHeroFilter({
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "base" ? "active" : ""}`}
-              onClick={() => handleQuickTag("base", "regolith")}
+              onClick={() => handleQuickTag("base")}
             >
               {isEn ? "Permanent Base" : "Base Permanente"}
             </button>
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "isru" ? "active" : ""}`}
-              onClick={() => handleQuickTag("isru", "cryogenic")}
+              onClick={() => handleQuickTag("isru")}
             >
               {isEn ? "ISRU Mining" : "Extracción ISRU"}
             </button>
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "caves" ? "active" : ""}`}
-              onClick={() => handleQuickTag("caves", "radiation")}
+              onClick={() => handleQuickTag("caves")}
             >
               {isEn ? "Lava Tubes" : "Tubos de Lava"}
             </button>
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "mobility" ? "active" : ""}`}
-              onClick={() => handleQuickTag("mobility", "regolith")}
+              onClick={() => handleQuickTag("mobility")}
             >
               {isEn ? "Rover Wheels" : "Ruedas de Rover"}
             </button>
