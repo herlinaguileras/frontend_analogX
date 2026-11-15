@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { getSpaceProfile, scienceDossierList } from "@/lib/analog-science-dossier";
-import type { SupportedLang } from "@/lib/translations";
+import { useLanguage } from "@/context/language-context";
 import { BloomHeroFilter } from "./bloom-hero-filter";
 import { DualWorldComparator } from "./dual-world-comparator";
 import { BloomGeologyComparison } from "./bloom-geology-comparison";
@@ -20,8 +20,8 @@ export function BloomExplorationView({
   // Body is strictly fixed to initialBody (to switch, user must return to home)
   const body: "Moon" | "Mars" = initialBody;
 
-  // Language state (default Spanish, switchable to English with one click)
-  const [lang, setLang] = useState<SupportedLang>("es");
+  // Global synchronized language state
+  const { lang, toggleLang } = useLanguage();
 
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [conditionFilter, setConditionFilter] = useState<string>("all");
@@ -74,10 +74,6 @@ export function BloomExplorationView({
     setEnvironmentFilter("all");
   };
 
-  const handleToggleLang = () => {
-    setLang((prev) => (prev === "es" ? "en" : "es"));
-  };
-
   return (
     <main className="bloom-exploration-page" style={{ background: "#050609", color: "#fff" }}>
       {/* 1. Fullscreen Hero with 3D Rotating Globe, Active Mission Badge, Translator & Liquid Glass Modal */}
@@ -93,7 +89,7 @@ export function BloomExplorationView({
         avgScore={avgScore}
         onApplyFilters={handleApplyFilters}
         lang={lang}
-        onToggleLang={handleToggleLang}
+        onToggleLang={toggleLang}
       />
 
       {/* 2. Interactive 1:1 Dual-World Terrain Comparator (Split Scrubber) */}

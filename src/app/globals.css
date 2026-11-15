@@ -213,6 +213,57 @@ h1, h2, h3, p { margin: 0; }
   box-shadow: 0 0 16px rgba(168, 85, 247, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
+.header-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.header-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.15);
+}
+
+.lang-pill-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lang-pill-btn:hover {
+  color: #ffffff;
+}
+
+.lang-pill-btn.active {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.6), rgba(56, 189, 248, 0.6));
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.lang-sep {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  user-select: none;
+}
+
 .project-tag {
   display: flex;
   gap: 10px;

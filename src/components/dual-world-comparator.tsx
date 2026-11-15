@@ -741,7 +741,11 @@ export function DualWorldComparator({
             {/* Space Column */}
             <div className={`dual-climate-col space ${currentPreset.body === "Mars" ? "mars" : ""}`}>
               <div className="col-header-tag">
-                <span>{currentPreset.body === "Mars" ? "🪐 ATMÓSFERA MARCIANA" : "🌕 EXOSFERA LUNAR"}</span>
+                <span>
+                  {currentPreset.body === "Mars"
+                    ? isEn ? "🪐 MARTIAN ATMOSPHERE" : "🪐 ATMÓSFERA MARCIANA"
+                    : isEn ? "🌕 LUNAR EXOSPHERE" : "🌕 EXOSFERA LUNAR"}
+                </span>
                 <small>{currentPreset.planetaryTarget.instrument}</small>
               </div>
 
@@ -775,7 +779,11 @@ export function DualWorldComparator({
             {/* Earth Twin Column */}
             <div className="dual-climate-col earth">
               <div className="col-header-tag">
-                <span>🌍 ANÁLOGO TERRESTRE ({currentPreset.earthTwin.name})</span>
+                <span>
+                  {isEn
+                    ? `🌍 EARTH ANALOG (${currentPreset.earthTwin.name})`
+                    : `🌍 ANÁLOGO TERRESTRE (${currentPreset.earthTwin.name})`}
+                </span>
                 <small>{currentPreset.earthTwin.instrument}</small>
               </div>
 

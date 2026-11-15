@@ -6,6 +6,7 @@ import { formatLocation, mapLocations, type BasemapId } from "@/lib/map-config";
 import { Icon } from "./icon";
 import { processFilters, type DetailedEarthRegionInfo, type EarthProcessCategory } from "@/lib/earth-catalog";
 import { getCountryView, GLOBAL_VIEW } from "@/lib/world-countries";
+import { useLanguage } from "@/context/language-context";
 
 if (typeof window !== "undefined") {
   maplibregl.setWorkerUrl("/maplibre-gl-worker.mjs");
@@ -277,10 +278,20 @@ export default function EarthMap({
     });
   }
 
+  const { lang } = useLanguage();
+  const isEn = lang === "en";
+
   const selectedRegion = visibleRegions.find(r => r.id === selectedId);
 
   return (
-    <div className="earth-map-container" aria-label="Visor 3D interactivo del planeta Tierra">
+    <div
+      className="earth-map-container"
+      aria-label={
+        isEn
+          ? "Interactive 3D viewer of planet Earth"
+          : "Visor 3D interactivo del planeta Tierra"
+      }
+    >
       {/* Esquinas técnicas HUD */}
       <div className="hud-corner top-left" />
       <div className="hud-corner top-right" />
@@ -295,8 +306,10 @@ export default function EarthMap({
         <div className="map-mission-tag">
           <span className="live-ping" style={{ backgroundColor: markerColor }} />
           <span>
-            GLOBO 3D SATELITAL ·{" "}
-            <strong>{visibleRegions.length} ANÁLOGOS AUDITADOS</strong>
+            {isEn ? "3D SATELLITE GLOBE · " : "GLOBO 3D SATELITAL · "}
+            <strong>
+              {visibleRegions.length} {isEn ? "AUDITED ANALOGS" : "ANÁLOGOS AUDITADOS"}
+            </strong>
           </span>
         </div>
 
@@ -307,7 +320,7 @@ export default function EarthMap({
             onClick={() => switchBasemap("satellite")}
           >
             <Icon name="globe" size={13} />
-            <span>Satélite 3D (Esri)</span>
+            <span>{isEn ? "3D Satellite (Esri)" : "Satélite 3D (Esri)"}</span>
           </button>
           <button
             type="button"
@@ -315,14 +328,14 @@ export default function EarthMap({
             onClick={() => switchBasemap("terrain")}
           >
             <Icon name="layers" size={13} />
-            <span>Relieve Sombreado</span>
+            <span>{isEn ? "Shaded Relief" : "Relieve Sombreado"}</span>
           </button>
           <button
             type="button"
             className={`layer-btn ${basemap === "cartographic" ? "active" : ""}`}
             onClick={() => switchBasemap("cartographic")}
           >
-            <span>Cartográfico</span>
+            <span>{isEn ? "Cartographic" : "Cartográfico"}</span>
           </button>
         </div>
       </div>
@@ -332,8 +345,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Acercar mapa"
-          title="Acercar zoom (+)"
+          aria-label={isEn ? "Zoom in" : "Acercar mapa"}
+          title={isEn ? "Zoom in (+)" : "Acercar zoom (+)"}
           onClick={() => {
             const map = mapRef.current;
             if (!map) return;
@@ -345,8 +358,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Alejar mapa"
-          title="Alejar zoom (−)"
+          aria-label={isEn ? "Zoom out" : "Alejar mapa"}
+          title={isEn ? "Zoom out (−)" : "Alejar zoom (−)"}
           onClick={() => {
             const map = mapRef.current;
             if (!map) return;
@@ -359,8 +372,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Recentrar vista orbital"
-          title="Recentrar vista del país / globo"
+          aria-label={isEn ? "Recenter orbital view" : "Recentrar vista orbital"}
+          title={isEn ? "Recenter country / globe view" : "Recentrar vista del país / globo"}
           onClick={resetView}
         >
           <Icon name="target" size={16} />
@@ -368,8 +381,8 @@ export default function EarthMap({
         <button
           type="button"
           className="map-nav-btn"
-          aria-label="Orientar al norte"
-          title="Orientar brújula al Norte"
+          aria-label={isEn ? "Reset compass north" : "Orientar al norte"}
+          title={isEn ? "Reset compass North" : "Orientar brújula al Norte"}
           onClick={() => mapRef.current?.resetNorth({ duration: 500 })}
         >
           <span className="compass-icon">N↑</span>
@@ -379,11 +392,11 @@ export default function EarthMap({
       {/* Barra inferior de telemetría y coordenadas dinámicas */}
       <div className="earth-coords-bar">
         <div className="coords-item">
-          <span className="coords-label">COORDENADAS CURSOR:</span>
+          <span className="coords-label">{isEn ? "CURSOR COORDS:" : "COORDENADAS CURSOR:"}</span>
           <strong>
             {cursorCoords
-              ? `${Math.abs(cursorCoords.lat).toFixed(4)}° ${cursorCoords.lat < 0 ? "S" : "N"} · ${Math.abs(cursorCoords.lng).toFixed(4)}° ${cursorCoords.lng < 0 ? "O" : "E"}`
-              : "20.3800° S · 66.9500° O"}
+              ? `${Math.abs(cursorCoords.lat).toFixed(4)}° ${cursorCoords.lat < 0 ? "S" : "N"} · ${Math.abs(cursorCoords.lng).toFixed(4)}° ${cursorCoords.lng < 0 ? (isEn ? "W" : "O") : "E"}`
+              : isEn ? "20.3800° S · 66.9500° W" : "20.3800° S · 66.9500° O"}
           </strong>
         </div>
         <div className="coords-sep">|</div>
@@ -393,8 +406,8 @@ export default function EarthMap({
         </div>
         <div className="coords-sep">|</div>
         <div className="coords-item">
-          <span className="coords-label">PROYECCIÓN:</span>
-          <strong>GLOBO 3D ESFÉRICO (WGS84)</strong>
+          <span className="coords-label">{isEn ? "PROJECTION:" : "PROYECCIÓN:"}</span>
+          <strong>{isEn ? "3D SPHERICAL GLOBE (WGS84)" : "GLOBO 3D ESFÉRICO (WGS84)"}</strong>
         </div>
         {selectedRegion && (
           <>
@@ -409,7 +422,11 @@ export default function EarthMap({
       {loading && (
         <div className="earth-map-loading-overlay">
           <span className="loading-spinner" />
-          <span>Generando esfera 3D y cargando ortofotos satelitales…</span>
+          <span>
+            {isEn
+              ? "Rendering 3D sphere & loading satellite orthophotos…"
+              : "Generando esfera 3D y cargando ortofotos satelitales…"}
+          </span>
         </div>
       )}
     </div>

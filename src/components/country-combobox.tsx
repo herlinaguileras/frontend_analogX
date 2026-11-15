@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { WORLD_COUNTRIES, type WorldCountry } from "@/lib/world-countries";
 import { allDetailedRegionsList } from "@/lib/earth-catalog";
+import { useLanguage } from "@/context/language-context";
 import { Icon } from "./icon";
 
 interface CountryComboboxProps {
@@ -18,6 +19,9 @@ function normalize(text: string): string {
 }
 
 export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryComboboxProps) {
+  const { lang } = useLanguage();
+  const isEn = lang === "en";
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightedIndex, setHighlightedIndex] = useState(0);
@@ -42,7 +46,7 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
     // Elemento Global
     const globalItem = {
       name: "all",
-      displayName: "Todos los países (Global)",
+      displayName: isEn ? "All countries (Global)" : "Todos los países (Global)",
       count: allDetailedRegionsList.length,
       isGlobal: true,
     };
@@ -53,7 +57,7 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
         globalItem,
         ...WORLD_COUNTRIES.map((c) => ({
           name: c.name,
-          displayName: c.name,
+          displayName: isEn ? c.nameEn : c.name,
           count: analogCounts[c.name] || 0,
           isGlobal: false,
         })),
@@ -63,7 +67,11 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
     // Con búsqueda: filtrar coincidencias por nombre en español o inglés
     const matches: { name: string; displayName: string; count: number; isGlobal: boolean }[] = [];
 
-    if (normalize("todos los paises global").includes(query) || normalize("global").includes(query)) {
+    if (
+      normalize("todos los paises global").includes(query) ||
+      normalize("all countries global").includes(query) ||
+      normalize("global").includes(query)
+    ) {
       matches.push(globalItem);
     }
 
@@ -73,7 +81,7 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
       if (matchNameEs || matchNameEn) {
         matches.push({
           name: c.name,
-          displayName: c.name,
+          displayName: isEn ? c.nameEn : c.name,
           count: analogCounts[c.name] || 0,
           isGlobal: false,
         });
@@ -86,9 +94,9 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
       if (b.isGlobal) return 1;
       if (a.count > 0 && b.count === 0) return -1;
       if (b.count > 0 && a.count === 0) return 1;
-      return a.displayName.localeCompare(b.displayName, "es");
+      return a.displayName.localeCompare(b.displayName, isEn ? "en" : "es");
     });
-  }, [searchQuery, analogCounts]);
+  }, [searchQuery, analogCounts, isEn]);
 
   // Actualizar el valor del input cuando cambia la selección externa
   useEffect(() => {
@@ -165,7 +173,7 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
   return (
     <div className="country-combobox-container" ref={containerRef}>
       <label htmlFor="country-search-input" className="filter-label">
-        País / Ámbito de Estudio:
+        {isEn ? "Country / Territorial Scope:" : "País / Ámbito de Estudio:"}
       </label>
 
       <div className="combobox-input-wrapper">
@@ -178,7 +186,11 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
           ref={inputRef}
           type="text"
           className="country-combobox-input"
-          placeholder="Escribe un país (ej. Bolivia, Chile, España, Japón…)"
+          placeholder={
+            isEn
+              ? "Type a country (e.g. Bolivia, Chile, Spain, Canada…)"
+              : "Escribe un país (ej. Bolivia, Chile, España, Canadá…)"
+          }
           value={searchQuery}
           onFocus={() => {
             setIsOpen(true);
@@ -200,7 +212,7 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
           <button
             type="button"
             className="combobox-clear-btn"
-            title="Restablecer a vista global"
+            title={isEn ? "Reset to global view" : "Restablecer a vista global"}
             onClick={() => {
               handleSelect("all");
               inputRef.current?.focus();
@@ -218,7 +230,15 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
             setIsOpen((prev) => !prev);
             inputRef.current?.focus();
           }}
-          aria-label={isOpen ? "Cerrar lista de países" : "Abrir lista de países"}
+          aria-label={
+            isOpen
+              ? isEn
+                ? "Close countries list"
+                : "Cerrar lista de países"
+              : isEn
+              ? "Open countries list"
+              : "Abrir lista de países"
+          }
         >
           {isOpen ? "▲" : "▼"}
         </button>
@@ -233,7 +253,9 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
         >
           {filteredCountries.length === 0 ? (
             <li className="combobox-empty-message">
-              No se encontraron países que coincidan con &quot;{searchQuery}&quot;
+              {isEn
+                ? `No countries found matching "${searchQuery}"`
+                : `No se encontraron países que coincidan con "${searchQuery}"`}
             </li>
           ) : (
             filteredCountries.map((item, index) => {
@@ -263,7 +285,14 @@ export function CountryCombobox({ selectedCountry, onSelectCountry }: CountryCom
 
                   {item.count > 0 && (
                     <span className="combobox-analog-badge">
-                      {item.count} {item.count === 1 ? "análogo" : "análogos"}
+                      {item.count}{" "}
+                      {item.count === 1
+                        ? isEn
+                          ? "analog"
+                          : "análogo"
+                        : isEn
+                        ? "analogs"
+                        : "análogos"}
                     </span>
                   )}
                 </li>
