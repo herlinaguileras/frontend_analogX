@@ -8,57 +8,17 @@ interface BloomGeologyComparisonProps {
   analogs: GeologyComparisonItem[];
   activeAnalog: GeologyComparisonItem | null;
   onSelectAnalog: (id: string) => void;
-  hasAppliedFilters: boolean;
-  totalBodyCount: number;
-  onApplyFilters: () => void;
-  onQuickFilter: (role: string) => void;
   body: "Moon" | "Mars";
   roleFilter: string;
-  conditionFilter: string;
-  environmentFilter: string;
-  onResetFilters: () => void;
   lang: SupportedLang;
 }
-
-const ROLE_LABELS: Record<string, { es: string; en: string }> = {
-  landing: { es: "Aterrizaje Seguro", en: "Safe Landing" },
-  base: { es: "Base Permanente", en: "Permanent Base" },
-  isru: { es: "Extracción ISRU", en: "ISRU Mining" },
-  caves: { es: "Tubos de Lava", en: "Lava Tubes" },
-  mobility: { es: "Ruedas de Rover", en: "Rover Wheels" },
-  astrobiology: { es: "Astrobiología", en: "Astrobiology" },
-};
-
-const CONDITION_LABELS: Record<string, { es: string; en: string }> = {
-  regolith: { es: "Regolito / Suelo", en: "Regolith / Soil" },
-  cryogenic: { es: "Frío Criogénico", en: "Cryogenic Cold" },
-  hyperarid: { es: "Hiperaridez Extrema", en: "Extreme Hyperaridity" },
-  radiation: { es: "Radiación UV", en: "UV Radiation" },
-  sulfate: { es: "Química Ácida", en: "Acid Chemistry" },
-};
-
-const ENVIRONMENT_LABELS: Record<string, { es: string; en: string }> = {
-  altiplano: { es: "Altiplano (>3,600m)", en: "Altiplano (>3,600m)" },
-  hyperarid: { es: "Desierto Hiperárido", en: "Hyperarid Desert" },
-  polar: { es: "Desierto Polar", en: "Polar Desert" },
-  volcanic: { es: "Cavidades Volcánicas", en: "Volcanic Cavities" },
-};
-
-const QUICK_PRESET_ROLES = ["landing", "base", "isru", "caves", "mobility"] as const;
 
 export function BloomGeologyComparison({
   analogs,
   activeAnalog,
   onSelectAnalog,
-  hasAppliedFilters,
-  totalBodyCount,
-  onApplyFilters,
-  onQuickFilter,
   body,
   roleFilter,
-  conditionFilter,
-  environmentFilter,
-  onResetFilters,
   lang,
 }: BloomGeologyComparisonProps) {
   const isMoon = body === "Moon";
@@ -77,11 +37,6 @@ export function BloomGeologyComparison({
     }
   };
 
-  const scrollToTopFilter = () => {
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
 
   const renderActiveCard = (item: GeologyComparisonItem) => {
     const spaceProfile = getSpaceProfile(item, body);
@@ -496,228 +451,79 @@ export function BloomGeologyComparison({
         </p>
       </div>
 
-      {/* State 1: Waiting for user filter selection */}
-      {!hasAppliedFilters && (
-        <div className="bloom-awaiting-filter-card liquid-glass-strong">
-          <span className="bloom-section-badge" style={{ marginBottom: "0.75rem" }}>
-            {isEn
-              ? "FILTER-DRIVEN COMPARISON · READY TO QUERY"
-              : "COMPARATIVA POR FILTRACIÓN · LISTO PARA CONSULTAR"}
-          </span>
-          <h3>
-            {isEn
-              ? "Indicate mission criteria above to compare matching surfaces"
-              : "Indica los criterios arriba para mostrar la comparativa de superficies"}
-          </h3>
-          <p>
-            {isEn
-              ? `Instead of rendering all ${totalBodyCount} geological dossiers at once, surface comparisons appear only for your filtered criteria and are inspected one analog at a time.`
-              : `En lugar de mostrar los ${totalBodyCount} dossiers geológicos de golpe, la comparativa de superficies aparece exclusivamente según el filtro indicado y se analiza una analogía a la vez.`}
-          </p>
-
-          <div className="bloom-quick-tags" style={{ justifyContent: "center", marginBottom: "1.5rem" }}>
-            {QUICK_PRESET_ROLES.map((roleKey) => (
-              <button
-                key={roleKey}
-                type="button"
-                className="bloom-quick-pill"
-                onClick={() => onQuickFilter(roleKey)}
-              >
-                {ROLE_LABELS[roleKey]?.[lang] ?? roleKey}
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: "flex", gap: "0.875rem", justifyContent: "center", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              onClick={scrollToTopFilter}
-              className="bloom-quick-pill"
-              style={{ padding: "0.75rem 1.25rem", fontSize: "0.8125rem" }}
-            >
-              {isEn ? "↑ Choose filters in top panel" : "↑ Elegir filtros en el panel superior"}
-            </button>
-            <button
-              type="button"
-              onClick={onApplyFilters}
-              className="bloom-cta-btn"
-              style={{ width: "auto", padding: "0.75rem 1.5rem" }}
-            >
-              {isEn
-                ? `Explore ${totalBodyCount} ${isMoon ? "Moon" : "Mars"} analogs (1 at a time)`
-                : `Explorar ${totalBodyCount} análogos de ${isMoon ? "la Luna" : "Marte"} (1 a la vez)`}
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* State 2: Filters applied */}
-      {hasAppliedFilters && (
+      {/* Render Active Analog Comparison Card */}
+      {analogs.length > 0 && activeAnalog && (
         <>
-          {/* Active Filters Bar */}
-          <div className="bloom-active-filters-bar liquid-glass">
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-              <span
-                style={{
-                  fontFamily: "var(--font-mono, monospace)",
-                  fontSize: "0.75rem",
-                  color: "rgba(255,255,255,0.6)",
-                  textTransform: "uppercase",
-                }}
-              >
-                {isEn ? "Applied filters:" : "Filtros aplicados:"}
-              </span>
-              <span className="bloom-quick-pill" style={{ background: "rgba(65,65,252,0.2)" }}>
-                {isEn ? "Body: " : "Cuerpo: "}
-                {isMoon
-                  ? isEn
-                    ? "The Moon (Artemis)"
-                    : "Luna (Artemis)"
-                  : isEn
-                  ? "Planet Mars"
-                  : "Planeta Marte"}
-              </span>
-              {roleFilter !== "all" && (
-                <span className="bloom-quick-pill">
-                  {isEn ? "Objective: " : "Objetivo: "}
-                  {ROLE_LABELS[roleFilter]?.[lang] ?? roleFilter}
-                </span>
-              )}
-              {conditionFilter !== "all" && (
-                <span className="bloom-quick-pill">
-                  {isEn ? "Condition: " : "Condición: "}
-                  {CONDITION_LABELS[conditionFilter]?.[lang] ?? conditionFilter}
-                </span>
-              )}
-              {environmentFilter !== "all" && (
-                <span className="bloom-quick-pill">
-                  {isEn ? "Scope: " : "Ámbito: "}
-                  {ENVIRONMENT_LABELS[environmentFilter]?.[lang] ?? environmentFilter}
-                </span>
-              )}
-              <span style={{ fontSize: "0.8125rem", color: "#7fd579", fontWeight: 600 }}>
-                {analogs.length}{" "}
-                {analogs.length === 1
-                  ? isEn
-                    ? "qualified analog"
-                    : "análogo calificado"
-                  : isEn
-                  ? "qualified analogs"
-                  : "análogos calificados"}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={onResetFilters}
-              className="bloom-quick-pill"
-              style={{ color: "#f87171", borderColor: "rgba(248,113,113,0.3)" }}
-            >
-              {isEn ? "✕ Clear all filters" : "✕ Limpiar todos los filtros"}
-            </button>
-          </div>
-
-          {/* Empty state when intersection matches nothing */}
-          {analogs.length === 0 && (
+          {analogs.length > 1 && (
             <div
-              className="liquid-glass-strong"
               style={{
-                maxWidth: "700px",
-                margin: "3rem auto",
-                padding: "3rem 2rem",
-                textAlign: "center",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                maxWidth: "1200px",
+                margin: "0 auto 1.5rem",
+                padding: "0 0.5rem",
+                flexWrap: "wrap",
+                gap: "1rem",
               }}
             >
-              <h3 style={{ color: "#fff", marginBottom: "0.75rem" }}>
-                {isEn
-                  ? "No analogs found with this strict filter intersection"
-                  : "No se encontraron análogos con este cruce estricto de filtros"}
-              </h3>
-              <p style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.5rem" }}>
-                {isEn
-                  ? "Try selecting a broader combination of geological criteria or clear filters to reset the query."
-                  : "Prueba seleccionando una combinación más amplia de criterios geológicos o haz clic en limpiar filtros para reiniciar la consulta."}
-              </p>
-              <button
-                type="button"
-                onClick={onResetFilters}
-                className="bloom-cta-btn"
-                style={{ maxWidth: "260px", margin: "0 auto" }}
+              <div
+                style={{
+                  fontFamily: "var(--font-mono, monospace)",
+                  fontSize: "0.8125rem",
+                  color: "rgba(255,255,255,0.7)",
+                }}
               >
-                {isEn ? "Reset Filters" : "Restablecer Filtros"}
-              </button>
+                {isEn
+                  ? `Showing analog ${activeIndex + 1} of ${analogs.length}`
+                  : `Mostrando análogo ${activeIndex + 1} de ${analogs.length}`}
+              </div>
+
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <button
+                  type="button"
+                  className="bloom-pager-btn"
+                  onClick={() => handleStepAnalog(-1)}
+                >
+                  {isEn ? "← Previous Analog" : "← Análogo Anterior"}
+                </button>
+                <button
+                  type="button"
+                  className="bloom-pager-btn"
+                  onClick={() => handleStepAnalog(1)}
+                >
+                  {isEn ? "Next Analog →" : "Siguiente Análogo →"}
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Single-Analog Selector & Single Card Comparison */}
-          {analogs.length > 0 && activeAnalog && (
-            <>
-              <div className="bloom-analog-selector-bar liquid-glass">
-                <div className="bloom-analog-selector-header">
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono, monospace)",
-                      fontSize: "0.75rem",
-                      color: "rgba(255,255,255,0.7)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.06em",
-                    }}
-                  >
-                    {isEn
-                      ? `Showing ${activeIndex + 1} of ${analogs.length} filtered comparisons`
-                      : `Mostrando ${activeIndex + 1} de ${analogs.length} comparativas filtradas`}
-                  </span>
-
-                  {analogs.length > 1 && (
-                    <div className="bloom-analog-pager">
-                      <button
-                        type="button"
-                        className="bloom-pager-btn"
-                        onClick={() => handleStepAnalog(-1)}
-                      >
-                        {isEn ? "← Previous" : "← Anterior"}
-                      </button>
-                      <button
-                        type="button"
-                        className="bloom-pager-btn"
-                        onClick={() => handleStepAnalog(1)}
-                      >
-                        {isEn ? "Next →" : "Siguiente →"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                <div
-                  className="bloom-analog-selector-tabs"
-                  role="tablist"
-                  aria-label={isEn ? "Filtered planetary analogs" : "Análogos filtrados"}
-                >
-                  {analogs.map((item, idx) => {
-                    const isSelected = item.id === activeAnalog.id;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        role="tab"
-                        aria-selected={isSelected}
-                        className={`bloom-analog-tab ${isSelected ? "active" : ""}`}
-                        onClick={() => onSelectAnalog(item.id)}
-                      >
-                        <span>
-                          {idx + 1}. {item.name}
-                        </span>
-                        <span className="bloom-analog-tab-score">{item.fidelityScore}%</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {renderActiveCard(activeAnalog)}
-            </>
-          )}
+          {renderActiveCard(activeAnalog)}
         </>
+      )}
+
+      {/* Empty State */}
+      {analogs.length === 0 && (
+        <div
+          className="liquid-glass-strong"
+          style={{
+            maxWidth: "700px",
+            margin: "3rem auto",
+            padding: "3rem 2rem",
+            textAlign: "center",
+          }}
+        >
+          <h3 style={{ color: "#fff", marginBottom: "0.75rem" }}>
+            {isEn
+              ? "No analogs found for this specific objective"
+              : "No se encontraron análogos para este objetivo específico"}
+          </h3>
+          <p style={{ color: "rgba(255,255,255,0.7)" }}>
+            {isEn
+              ? "Select another mission objective in the top panel to explore matching Earth sites."
+              : "Selecciona otro objetivo de misión en el panel superior para explorar los sitios terrestres correspondientes."}
+          </p>
+        </div>
       )}
     </section>
   );
