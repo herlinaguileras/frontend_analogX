@@ -27,8 +27,9 @@ npm run dev
 
 Abre `http://localhost:3000`. La ruta `/` redirige a `/explore`.
 
-- `/explore`: búsqueda por nombre, filtros por rol y ámbito geográfico (Global y Altiplano),
-  selección de 6 destinos en Marte y la Luna, mapa mundial 360° con zoom/capas y fichas de regiones.
+- `/`: Hero principal con Globo ASCII 3D y accesos directos al Reto NASA.
+- `/earth`: Vista de la Tierra 360°, Globo Esférico 3D (MapLibre GL), selector de 177 países con animación orbital, filtros por fenómeno físico sin emojis y fichas técnicas NASA (Topología, Clima, ISRU, Aterrizaje y Rigor Epistemológico).
+- `/explore`: consola científica de análogos terrestres contrastados con 6 destinos en Marte y la Luna.
 - `/compare`: comparación por variable, terradinámica de rovers, balance ISRU de agua,
   blindaje de hábitats, Scorecard de 7 Dimensiones NASA y Cláusula de Rigor Epistemológico.
 - `/methodology`: procedencia, compatibilidad, verificación y fuentes cartográficas globales.

@@ -82,6 +82,55 @@ export const mapLocations: Partial<Record<string, MapLocation>> = {
     source_crs: "WGS84 (EPSG:4326)",
     note: "Tubo volcánico de la Corona: campo oficial de entrenamiento de astronautas de la ESA.",
   },
+  "salar-coipasa": {
+    position: [-68.15, -19.30],
+    source_name: "NASA PDS / SERGEOMIN Bolivia",
+    source_url: "https://doi.org/10.1016/0012-821X(91)90104-Y",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Cuenca evaporítica de halita, sulfatos y boratos; análogo de paleolagos en Marte.",
+  },
+  "laguna-colorada": {
+    position: [-67.78, -22.20],
+    source_name: "NASA Ames / SETI Astrobiology Field Studies",
+    source_url: "https://doi.org/10.1029/2006JG000318",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Salmuera alcalina hipersalina con extremófilos carotenoides bajo radiación UV extrema.",
+  },
+  "arenales-uyuni": {
+    position: [-66.85, -20.65],
+    source_name: "AnalogX · Terradinámica Altiplánica",
+    source_url: "https://calval.cr.usgs.gov/apps/uyuni-salt-flats",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Campos de dunas de arena árida y partículas finas para ensayos de tracción de ruedas metálicas.",
+  },
+  "volcan-ollague": {
+    position: [-68.18, -21.30],
+    source_name: "SERNAGEOMIN / Observatorio San Calixto",
+    source_url: "https://doi.org/10.1016/j.jvolgeores.2007.08.017",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Estratovolcán activo con depósitos de azufre hidrotermal para ensayos de reactores químicos ISRU.",
+  },
+  "cordillera-sal-atacama": {
+    position: [-68.28, -22.95],
+    source_name: "NASA Astrobiology / Valle de la Luna",
+    source_url: "https://doi.org/10.1126/science.1089143",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Costras poligonales de halita de desecación rápida y cañones sin agua en el Desierto de Atacama.",
+  },
+  "lago-vanda-taylor": {
+    position: [161.55, -77.52],
+    source_name: "USGS Antarctic Geographic Names / NSF",
+    source_url: "https://doi.org/10.1130/0016-7606(2002)114",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Canales subglaciares hipersalinos con flujo de óxidos de hierro en desierto frío polar.",
+  },
+  "parque-timanfaya": {
+    position: [-13.73, 29.00],
+    source_name: "ESA PANGAEA / Parque Nacional de Timanfaya",
+    source_url: "https://doi.org/10.1016/j.earscirev.2020.103288",
+    source_crs: "WGS84 (EPSG:4326)",
+    note: "Campos de lava basáltica prístina sin vegetación para calibración espectral orbital y rovers.",
+  },
 };
 
 export const regionalView = { center: [-35.0, 15.0] as [number, number], zoom: 2.2 };

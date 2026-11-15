@@ -146,7 +146,7 @@ export function Exploration({
   initialBody = "Mars",
 }: {
   mode?: "explore" | "compare";
-  initialRegionId?: string;
+  initialRegionId?: string | undefined;
   initialBody?: "Mars" | "Moon";
 }) {
   const [regionsList, setRegionsList] = useState<EarthRegion[]>(studyRegions);
@@ -250,13 +250,13 @@ export function Exploration({
       <div className="workspace-heading">
         <div>
           <div className="eyebrow">
-            <span />EXPLORACIÓN PLANETARIA <span className="eyebrow-divider">/</span> CATÁLOGO GLOBAL & BOLIVIA
+            <span />EXPLORACIÓN PLANETARIA <span className="eyebrow-divider">/</span> {mode === "compare" ? "MATRIZ DE COMPARACIÓN" : "CONSOLA CARTOGRÁFICA"}
           </div>
-          <h1>{mode === "compare" ? "Conecta mundos. Contrasta evidencia." : "Otros mundos empiezan en la Tierra."}</h1>
+          <h1>{mode === "compare" ? "Conecta mundos. Contrasta evidencia." : "Consola de Exploración de Análogos Planetarios"}</h1>
           <p>
             {mode === "compare"
-              ? "Examina cada variable y comprende los límites de la analogía."
-              : "Explora análogos de referencia global y la propuesta de novedad del Altiplano boliviano."}
+              ? "Examina cada variable física instrumental y comprende los límites de la analogía terrestre."
+              : `Analizando análogos terrestres para ${body === "Moon" ? "la Base Lunar Permanente de Artemis (Polo Sur y Marius Hills)" : "misiones de exploración a Marte (Jezero, Gale y Terra Sirenum)"}.`}
           </p>
         </div>
         <div className="workspace-status">
@@ -266,10 +266,20 @@ export function Exploration({
             <span className="live-badge" style={{ color: "#94a3b8" }}>CATÁLOGO CIENTÍFICO</span>
           )}
           <span className="status-divider">·</span>
-          <span style={{ fontSize: "9.5px", color: "#c084fc", fontWeight: 700, letterSpacing: "1px" }}>
+          <span style={{ fontSize: "9.5px", color: "#7fd579", fontWeight: 700, letterSpacing: "1px" }}>
             NASA SPACE APPS 2026
           </span>
         </div>
+      </div>
+
+      <div className="mission-telemetry-banner" style={{ margin: "0 0 16px 0" }}>
+        <div className="telemetry-indicator">
+          <span className="pulse-ping" />
+          <span>OBJETIVO ACTIVO: <strong>{body === "Moon" ? "LUNA · PROGRAMA ARTEMIS (POLO SUR / SHACKLETON)" : "MARTE · EXPLORACIÓN PLANETARIA (JEZERO / GALE / SIRENUM)"}</strong></span>
+        </div>
+        <span className="telemetry-meta">
+          9 REGIONES MUNDIALES DISPONIBLES · MAPA SATELITAL 360° ACTIVO
+        </span>
       </div>
 
       <div className={`explorer-grid ${mode === "compare" ? "comparison-mode" : ""}`}>
