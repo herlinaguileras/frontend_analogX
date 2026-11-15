@@ -301,7 +301,23 @@ export default function HomePage() {
           <div className="footer-info">
             <span>{isEn ? "Challenge: Permanent Moon Base Locations & Mars" : "Reto: Permanent Moon Base Locations & Mars"}</span>
             <span className="footer-sep">·</span>
-            <span>{isEn ? "Open Data: NASA PDS · ESA CDSE · USGS EROS" : "Datos Abiertos: NASA PDS · ESA CDSE · USGS EROS"}</span>
+            <a
+              href="https://github.com/herlinaguileras/frontend_analogX"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#c084fc", textDecoration: "underline" }}
+            >
+              Frontend GitHub ↗
+            </a>
+            <span className="footer-sep">·</span>
+            <a
+              href="https://github.com/herlinaguileras/backend_analogX"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#38bdf8", textDecoration: "underline" }}
+            >
+              Backend API GitHub ↗
+            </a>
           </div>
           <div className="footer-scroll-top">
             <a href="#top" className="scroll-top-btn">

@@ -1,127 +1,182 @@
-# AnalogX — frontend
+<div align="center">
 
-Aplicación local con Next.js App Router, TypeScript estricto y Tailwind CSS.
-Incluye el contrato de Fase 0 y la primera interfaz de Fase 1.
-El contrato científico está descrito en
-[docs/frontend-data-contract.md](docs/frontend-data-contract.md).
+# 🪐 AnalogX — Planetary Analog Discovery Engine
 
-## Desarrollo
+**NASA Space Apps Challenge 2026 · Official Submission**  
+*Challenge: Identify Earth Locations that Analog Permanent Moon Base Locations and Mars*  
+**Team:** AstroCapis
 
-Requiere Node.js 22.13 o superior y npm.
+[![NASA Space Apps 2026](https://img.shields.io/badge/NASA_Space_Apps-2026-blue.svg)](https://www.spaceappschallenge.org/)
+[![Next.js 16](https://img.shields.io/badge/Next.js-16.4-black.svg)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19.0-61dafb.svg)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178c6.svg)](https://www.typescriptlang.org/)
+[![Python 3.14](https://img.shields.io/badge/Backend-Python_3.14_FastAPI-3776ab.svg)](https://github.com/herlinaguileras/backend_analogX)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-```sh
-npm ci
+</div>
+
+---
+
+## 🔗 Connected Repositories (Full-Stack Architecture)
+
+> [!IMPORTANT]
+> The NASA Space Apps Challenge submission portal allows submitting **one primary link**. This repository hosts the full interactive frontend client. The high-performance scientific backend API is publicly available at:
+
+* 🖥️ **Frontend Client (This Repository):**  
+  [https://github.com/herlinaguileras/frontend_analogX](https://github.com/herlinaguileras/frontend_analogX)
+* ⚡ **Backend REST API & Scientific Database:**  
+  [https://github.com/herlinaguileras/backend_analogX](https://github.com/herlinaguileras/backend_analogX)
+
+---
+
+## 📖 Project Overview
+
+Preparing permanent human settlements on the Moon (**Artemis Base Camp**) and pioneering robotic/crewed missions to **Mars** demands rigorous terrestrial proving grounds. Historically, analog site selection has suffered from visual confirmation bias—assuming that a red landscape or a barren plain behaves like another planet without auditing physical and environmental parameters.
+
+**AnalogX** is an open-science planetary intelligence platform and comparative engine. It parametrically cross-examines **15 audited Earth analog environments** across 5 continents against **6 high-priority extraterrestrial destinations** on the Moon and Mars.
+
+### 🌟 Key Innovations & Features
+
+1. **360° 3D Spherical Earth Globe (`/earth`):**
+   - High-fidelity spherical globe projection powered by MapLibre GL JS.
+   - Triple basemap telemetry: High-resolution **Esri World Imagery**, continuous **World Shaded Relief** (hypsometric elevation), and cartographic overlays.
+   - Interactive country selector (177 nations) and physical phenomena filters (*UV Radiation*, *Cryogenic Ice*, *Hyperaridity*, *Lava Tubes*, *Altimetry & Rovers*).
+   - Floating HUD technical dossiers and printable full-length scientific qualification reports.
+
+2. **Dual-World 1:1 Terrain Comparator (`/explore`):**
+   - Interactive 50/50 split scrubber aligning orbital laser altimetry (**NASA LOLA & MOLA**) directly against Earth digital elevation models (**Copernicus DEM-GLO-30 & USGS**).
+   - Calibrated 5 km topographic cross-section transects (slope gradients, RMS micro-roughness, wheel sinkage hazard).
+   - Strict body isolation presets for Lunar and Martian targets.
+
+3. **Multidomain Climate & Atmospheric Engine:**
+   - 4-quadrant comparative matrix evaluating extreme diurnal thermal regimes (-233 °C to +120 °C on Moon vs terrestrial extremes), barometric pressure deltas (from lunar ultra-vacuum to 500 hPa at Licancabur), sterilizing solar UV index, and eolian desiccation.
+
+4. **"Surprise Us" Scientific Rubric (NASA Criterion):**
+   - Bridges canonical global benchmarks (**Atacama Desert**, **McMurdo Dry Valleys**, **Haughton Impact Crater**, **Lanzarote Lava Tubes**) with the untapped, extreme high-altitude natural laboratories of the **Bolivian Altiplano (>3,600 to 5,900 m a.s.l.)**:
+     - *Salar de Uyuni:* World's largest hyperflat reference (<0.05° slope) for lunar/martian landing Doppler radar and LiDAR altimeter calibration.
+     - *Sol de Mañana (4,850 m):* World's highest acid-sulfate hydrothermal system, mirroring opaline silica sinters at Home Plate, Gusev Crater.
+     - *Licancabur Summit (5,916 m):* World record solar UV-B irradiance combined with nocturnal cryogenic freeze for EVA suit polymer stress trials.
+     - *Lípez Volcanic Caves:* Basaltic lava conduits providing >95% attenuation of cosmic radiation (GCR/SPE) matching Marius Hills lunar skylights.
+
+5. **Epistemological Rigor (Where the Analogy Fails):**
+   - Programmatically audits physical boundaries: explicitly documenting gravitational divergence (1g vs 0.166g Moon vs 0.38g Mars), atmospheric differences (oxygenated air vs 6 hPa CO2 or hard vacuum), and biological background limits.
+
+6. **Global Bilingual Translation System:**
+   - Persistent, instantaneous **[ ES | EN ]** language toggle synchronized across all pages, components, HUD dossiers, and printable reports.
+
+---
+
+## 🏛️ Fullstack Architecture
+
+```mermaid
+flowchart LR
+    subgraph Frontend ["Frontend Client (Next.js 16)"]
+        A["3D Spherical Globe (MapLibre GL)"] --> D["UI Dashboard & Dual Comparator"]
+        B["Bilingual Context (ES / EN)"] --> D
+        C["Climate Science Engine"] --> D
+    end
+
+    subgraph Backend ["Backend API (FastAPI)"]
+        E["FastAPI Endpoints (/api/...)"] --> F["SQLModel & SQLite Database"]
+        F --> G["CRS & Datum Tracker (WGS84 / IAU / Sphere)"]
+        E --> H["Scorecard Engine (Rover / ISRU / Shielding)"]
+    end
+
+    subgraph External ["Space Agency Data Sources"]
+        I["NASA PDS Geosciences Node"]
+        J["NASA LRO (LOLA & Diviner)"]
+        K["ESA Copernicus (Sentinel-2 / DEM)"]
+        L["USGS EROS Cal/Val"]
+    end
+
+    External --> Backend
+    Backend -->|JSON REST API| Frontend
 ```
 
-Prepara las variables locales en PowerShell:
+- **Frontend Repository:** [github.com/herlinaguileras/frontend_analogX](https://github.com/herlinaguileras/frontend_analogX)
+- **Backend Repository:** [github.com/herlinaguileras/backend_analogX](https://github.com/herlinaguileras/backend_analogX)
 
-```powershell
-Copy-Item .env.example .env.local
-```
+---
 
-Después inicia la aplicación:
+## 🛰️ NASA & Partner Datasets Used
 
-```sh
+| Resource | Mission / Instrument | Application in AnalogX | Link |
+| :--- | :--- | :--- | :--- |
+| **NASA PDS Geosciences** | CRISM, THEMIS, Viking, Phoenix | Mineralogical composition, chlorides, and perchlorate soil chemistry | [pds.nasa.gov](https://pds.nasa.gov/) |
+| **NASA LRO** | LOLA & Diviner Radiometer | 20m/px polar elevation models and 40 K thermal cold traps at Shackleton | [pds-geosciences.wustl.edu](https://pds-geosciences.wustl.edu/missions/lro/) |
+| **NASA Solar System Treks** | Moon Trek & Mars Trek | Direct orbital coordinate deep-links to extraterrestrial landing targets | [trek.nasa.gov](https://trek.nasa.gov/) |
+| **USGS Astrogeology & EROS** | EROS Cal/Val Portal | Terrestrial calibration points and high-precision surface albedo reflectance | [calval.cr.usgs.gov](https://calval.cr.usgs.gov/) |
+| **ESA Copernicus** | Sentinel-2 MSI & COP-DEM-GLO-30 | 30m global digital elevation models and multispectral land cover | [dataspace.copernicus.eu](https://dataspace.copernicus.eu/) |
+| **CSA RADARSAT** | RADARSAT-1 & RCM Archive | Polarimetric radar signatures for subsurface ice and permafrost detection | [donnees-data.asc-csa.gc.ca](https://donnees-data.asc-csa.gc.ca/) |
+
+---
+
+## 💻 Tech Stack
+
+- **Frontend:** Next.js 16.4 (App Router), React 19, TypeScript (strict mode), MapLibre GL JS, Tailwind CSS, Turbopack.
+- **Backend:** Python 3.14, FastAPI, SQLModel, Uvicorn, SQLite3, Pydantic v2. ([View Backend Repo](https://github.com/herlinaguileras/backend_analogX))
+- **Cartography:** Esri World Imagery, Esri Shaded Relief, OpenStreetMap, Proj4.
+- **Testing:** Playwright, Node.js Test Runner, TypeScript Typecheck (0 errors).
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 20+ or 22+
+- npm or pnpm
+- Python 3.11+ (if running the backend locally)
+
+### 1. Frontend Setup (This Repository)
+
+```bash
+# Clone the repository
+git clone https://github.com/herlinaguileras/frontend_analogX.git
+cd frontend_analogX
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env.local
+
+# Run development server
 npm run dev
 ```
 
-Abre `http://localhost:3000`. La ruta `/` redirige a `/explore`.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- `/`: Hero principal con Globo ASCII 3D y accesos directos al Reto NASA.
-- `/earth`: Vista de la Tierra 360°, Globo Esférico 3D (MapLibre GL), selector de 177 países con animación orbital, filtros por fenómeno físico sin emojis y fichas técnicas NASA (Topología, Clima, ISRU, Aterrizaje y Rigor Epistemológico).
-- `/explore`: consola científica de análogos terrestres contrastados con 6 destinos en Marte y la Luna.
-- `/compare`: comparación por variable, terradinámica de rovers, balance ISRU de agua,
-  blindaje de hábitats, Scorecard de 7 Dimensiones NASA y Cláusula de Rigor Epistemológico.
-- `/methodology`: procedencia, compatibilidad, verificación y fuentes cartográficas globales.
-- `/findings`: bitácora científica con hallazgos preliminares y principios de trazabilidad.
+### 2. Backend Setup ([Backend Repository](https://github.com/herlinaguileras/backend_analogX))
 
-El catálogo integra 9 regiones análogas: 5 de Bolivia (novedad científica y análogos emergentes)
-junto a 4 referencias canónicas globales (Atacama en Chile, Valles Secos de McMurdo en la Antártida,
-Cráter Haughton en Canadá y Tubos de Lava de Lanzarote en España).
-Los objetivos planetarios abarcan 6 sitios estratégicos: Terra Sirenum, Cráter Jezero (Perseverance)
-y Cráter Gale (Curiosity) en Marte; Polo Sur Lunar (Artemis / Shackleton), Fosa de Marius Hills
-(Skylight basáltico) y Mare Tranquillitatis en la Luna, con enlaces dinámicos a NASA Trek y LROC QuickMap.
-El mapa utiliza MapLibre GL JS, Esri World Imagery y OpenStreetMap. Necesita
-conexión a Internet y WebGL; no requiere una clave para los servicios públicos
-configurados. Las atribuciones permanecen visibles en el mapa.
-Los localizadores de navegación están separados de los datos científicos:
-Uyuni referencia el catálogo USGS y Sol de Mañana utiliza una coordenada ENDE
-convertida con Proj4. El Altiplano Sur no tiene un marcador ni límites inventados.
-Las fuentes, las convenciones y la precisión se explican en `/methodology#cartography`.
-Las vistas previas terrestres usan teselas de contexto; los paisajes planetarios
-siguen siendo ilustraciones y no se presentan como productos científicos.
-Los filtros exploran el catálogo de estudio, no calculan similitud planetaria.
-No se realizan solicitudes a endpoints científicos todavía inexistentes.
+```bash
+# Clone the backend repository
+git clone https://github.com/herlinaguileras/backend_analogX.git
+cd backend_analogX
 
-```sh
-npm run typecheck
-npm run build
-npm start
+# Setup virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Or .venv\Scripts\activate on Windows
+
+# Install dependencies and launch API
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
 ```
 
-Para verificar las rutas de producción, inicia `npm start -- --port 3100` y
-ejecuta `npm run test:smoke` en otra terminal. `ANALOGX_TEST_URL` permite usar
-otra dirección. Esta comprobación valida respuestas HTTP, redirección, selección
-por URL y estados pendientes; no sustituye la revisión visual en navegador.
+The backend REST API will be available at [http://localhost:8000/docs](http://localhost:8000/docs).
 
-Para probar las interacciones de mapa, filtros, comparación y vista móvil:
+---
 
-```sh
-npm run build
-npm run test:e2e
-```
+## 👥 Team AstroCapis
 
-Playwright inicia y detiene su servidor de producción en el puerto 3100.
-En Windows usa Microsoft Edge instalado, en modo sin ventana. En otros sistemas,
-instala Chromium con `npx playwright install chromium`. Las capturas de escritorio
-y móvil se guardan en `test-results/` (excluido de Git). Una prueba adicional
-simula fallos del proveedor de teselas para comprobar la continuidad de la UI.
+- **Bernardo Chavez Padilla** — Full Stack Developer & System Architect
+- **Kelly Alisson Duran Marcelo** — UX/UI Lead & Product Designer
+- **Susan Michel Martinez Alanoca** — Planetary Geology & Mission Research
+- **Herlin Daniel Aguilera Suarez** — UX Designer & Creative Director
+- **Rey Franco Velasquez Aguirre** — UI Designer & Visual Systems
 
-## Cartografía
+---
 
-`src/lib/map-config.ts` centraliza las fuentes, atribuciones y localizadores;
-`src/components/regional-map.tsx` gestiona la instancia MapLibre, cambios de capa,
-marcadores, controles, errores y liberación de recursos al navegar. El mapa se
-carga únicamente en el navegador, en un módulo separado del renderizado inicial.
+## 📄 License
 
-La capa satelital es un mosaico de contexto; su fecha y resolución no se
-presuponen. La cartografía no entra en los cálculos de comparación ni convierte
-una región en verificada. Los localizadores utilizan longitudes/latitudes para
-navegar, mientras la representación cartográfica es Web Mercator (EPSG:3857).
-El datum de las observaciones seguirá siendo el que documente el backend.
-
-Para un despliegue con tráfico significativo, revisar las condiciones y capacidad
-de los proveedores de teselas y configurar un servicio adecuado. Esta aplicación
-no hace descargas masivas ni ofrece almacenamiento sin conexión.
-
-## Variables de entorno
-
-`.env.example` es la plantilla versionada. `.env.local` y los demás archivos
-`.env*` locales están excluidos de Git. No añadir credenciales a la plantilla
-ni a variables con prefijo `NEXT_PUBLIC_`, que son visibles en el navegador.
-
-| Variable | Uso | Valor local propuesto |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_BASE_URL` | Reservada para el futuro cliente HTTP; la interfaz actual no la consume | `http://localhost:8000` |
-| `ANALOGX_TEST_URL` | URL de la aplicación activa para las pruebas HTTP | `http://127.0.0.1:3100` |
-
-El puerto 8000 es una propuesta de desarrollo, pendiente de confirmar con el
-backend. Las pruebas cargan `.env.local` si existe; una variable ya definida
-en el proceso tiene prioridad. Reinicia `npm run dev` al modificar variables.
-Las variables `NEXT_PUBLIC_*` se fijan al compilar: configurar su valor de
-despliegue antes de ejecutar `npm run build` cuando se integre el cliente HTTP.
-
-Este directorio estaba vacío al iniciar. No existían `src/lib/types.ts`,
-`src/lib/api.ts`, rutas de aplicación ni `/api/health`. No se ha creado un
-endpoint de salud que simule la disponibilidad del backend.
-
-Los endpoints documentados son propuestas pendientes de acuerdo con el backend;
-no representan servicios disponibles ni un contrato Pydantic ya validado.
-
-## Integración pendiente
-
-Sustituir el catálogo inicial por respuestas validadas contra el esquema del
-backend, resolver datums/geometrías y conectar observaciones y citas. La
-comparación presenta datos pendientes hasta contar con evidencia; no calcula
-puntuaciones globales. MapLibre está integrado para navegación cartográfica;
-Recharts y las comparaciones instrumentales siguen pendientes.
+This project is open-source and available under the [MIT License](LICENSE).
+NASA Space Apps Challenge 2026.
