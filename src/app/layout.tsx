@@ -8,6 +8,13 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata: Metadata = {
   title: "AnalogX — Planetary Analog Discovery Engine",
   description: "Arquitectura de datos científicos para el estudio de análogos planetarios.",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
