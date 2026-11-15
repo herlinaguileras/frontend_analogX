@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { BloomCelestialGlobe } from "./bloom-celestial-globe";
 import type { SupportedLang } from "@/lib/translations";
 
@@ -7,11 +8,6 @@ interface BloomHeroFilterProps {
   body: "Moon" | "Mars";
   roleFilter: string;
   onRoleFilterChange: (val: string) => void;
-  conditionFilter: string;
-  onConditionFilterChange: (val: string) => void;
-  environmentFilter: string;
-  onEnvironmentFilterChange: (val: string) => void;
-  onQuickFilter: (role: string) => void;
   matchCount: number;
   avgScore: number;
   onApplyFilters: () => void;
@@ -23,11 +19,6 @@ export function BloomHeroFilter({
   body,
   roleFilter,
   onRoleFilterChange,
-  conditionFilter,
-  onConditionFilterChange,
-  environmentFilter,
-  onEnvironmentFilterChange,
-  onQuickFilter,
   matchCount,
   avgScore,
   onApplyFilters,
@@ -37,10 +28,6 @@ export function BloomHeroFilter({
   const isMoon = body === "Moon";
   const isEn = lang === "en";
 
-  const handleQuickTag = (role: string) => {
-    onQuickFilter(role);
-  };
-
   return (
     <section className="bloom-explore-hero">
       {/* 3D Rotating NASA Celestial Body in Background */}
@@ -48,8 +35,28 @@ export function BloomHeroFilter({
 
       {/* Top Navigation */}
       <header className="bloom-hero-nav">
-        {/* Left: Technical System Badge */}
+        {/* Left: Back to Home link (not "back to earth") */}
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <Link
+            href="/"
+            className="bloom-nav-pill liquid-glass"
+            style={{
+              textDecoration: "none",
+              color: "#ffffff",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              borderRadius: "9999px",
+              fontSize: "0.8125rem",
+              padding: "0.45rem 1rem",
+              background: "rgba(255, 255, 255, 0.08)",
+              border: "1px solid rgba(255, 255, 255, 0.22)",
+            }}
+          >
+            <span style={{ fontSize: "1rem" }}>←</span>
+            <span>{isEn ? "Back to Home" : "Volver al Inicio"}</span>
+          </Link>
+
           <div
             className="liquid-glass"
             style={{
@@ -187,228 +194,146 @@ export function BloomHeroFilter({
                 : "Encuentra Análogos Terrestres para Marte"}
             </h1>
             <p className="bloom-modal-desc">
-              {isEn
-                ? "Apply mission, terrain geology, and extreme environment filters to discover Earth regions with maximum analytical fidelity."
-                : "Aplica los filtros de misión, geología del terreno y entorno extremo para descubrir regiones de la Tierra con máxima fidelidad analítica."}
+              {isMoon
+                ? isEn
+                  ? "Select your mission's operational objective on the Moon. AnalogX identifies and characterizes the optimal Earth analogs using audited satellite data."
+                  : "Selecciona el objetivo operacional de tu misión en la Luna. AnalogX identificará y caracterizará los análogos terrestres óptimos mediante datos satelitales auditados."
+                : isEn
+                ? "Select your mission's operational objective on Mars. AnalogX identifies and characterizes the optimal Earth analogs using audited satellite data."
+                : "Selecciona el objetivo operacional de tu misión en Marte. AnalogX identificará y caracterizará los análogos terrestres óptimos mediante datos satelitales auditados."}
             </p>
           </div>
 
-          {/* Form Filter Fields */}
+          {/* Form Filter Field: Single, Coherent Operational Objective Dropdown */}
           <div className="bloom-filter-group">
-            {/* Filter 1: Operational Mission Role */}
-            <div className="bloom-filter-field">
-              <label className="bloom-field-label">
-                {isEn ? "01 · Mission Objective & Operational Use" : "01 · Objetivo de Misión & Uso Operativo"}
-              </label>
-              <select
-                className="bloom-select"
-                value={roleFilter}
-                onChange={(e) => onRoleFilterChange(e.target.value)}
-              >
-                <option value="all">
-                  {isEn ? "All operational objectives" : "Todos los objetivos operacionales"}
-                </option>
-                <option value="landing">
-                  {isEn
-                    ? "Safe Landing Sites & Terrain Relative Navigation (TRN)"
-                    : "Sitios de Aterrizaje y Navegación Óptica Guiada (TRN)"}
-                </option>
-                <option value="base">
-                  {isEn
-                    ? "Permanent Base Siting & Human Habitats"
-                    : "Emplazamiento de Base Permanente y Hábitats Humanos"}
-                </option>
-                <option value="isru">
-                  {isEn
-                    ? "In-Situ Resource Utilization (ISRU: Water Ice, Minerals, Oxygen)"
-                    : "Extracción de Recursos In-Situ (ISRU: Hielo, Minerales, Oxígeno)"}
-                </option>
-                <option value="caves">
-                  {isEn
-                    ? "Lava Tube Shelters & Cosmic Radiation Shielding"
-                    : "Refugio en Tubos de Lava y Blindaje contra Radiación Cósmica"}
-                </option>
-                <option value="mobility">
-                  {isEn
-                    ? "Wheel Terradynamics & Rover Mobility"
-                    : "Terradinámica de Ruedas y Movilidad de Rovers"}
-                </option>
-                <option value="astrobiology">
-                  {isEn
-                    ? "Astrobiology & Extremophile Habitability Limits"
-                    : "Astrobiología y Límite de Habitabilidad en Extremofilia"}
-                </option>
-              </select>
-            </div>
-
-            {/* Filter 2: Physical / Environmental Condition */}
             <div className="bloom-filter-field">
               <label className="bloom-field-label">
                 {isEn
-                  ? "02 · Physical-Environmental & Geological Condition"
-                  : "02 · Condición Físico-Ambiental & Geológica"}
+                  ? "01 · Operational Mission Objective"
+                  : "01 · Objetivo de Misión & Uso Operativo"}
               </label>
-              <select
-                className="bloom-select"
-                value={conditionFilter}
-                onChange={(e) => onConditionFilterChange(e.target.value)}
-              >
-                <option value="all">
-                  {isEn ? "All geological conditions" : "Todas las condiciones geológicas"}
-                </option>
-                <option value="regolith">
-                  {isEn
-                    ? "Basaltic Regolith, Salt Crusts & Rocky Terrain"
-                    : "Regolito Basáltico, Costras Salinas y Terreno Rocoso"}
-                </option>
-                <option value="cryogenic">
-                  {isEn
-                    ? "Extreme Cryogenic Cold & Fossil Ice Traps"
-                    : "Frío Criogénico Extremo y Trampas de Hielo Fósil"}
-                </option>
-                <option value="hyperarid">
-                  {isEn
-                    ? "Hyperaridity, Aeolian Dust & Severe Desiccation"
-                    : "Hiperaridez, Polvo Eólico y Desecación Severa"}
-                </option>
-                <option value="radiation">
-                  {isEn
-                    ? "Sterilizing UV Radiation & Cosmic Rays (GCR/SPE)"
-                    : "Radiación UV Esterilizante y Rayos Cósmicos (GCR/SPE)"}
-                </option>
-                <option value="sulfate">
-                  {isEn
-                    ? "Saline Paleolakes, Sulfates & Hydrothermal Alteration"
-                    : "Paleocuencas Salinas, Sulfatos y Alteración Hidrotermal"}
-                </option>
-              </select>
-            </div>
 
-            {/* Filter 3: Earth Realm */}
-            <div className="bloom-filter-field">
-              <label className="bloom-field-label">
-                {isEn ? "03 · Geographic Scope or Earth Realm" : "03 · Ámbito o Entorno Terrestre"}
-              </label>
-              <select
-                className="bloom-select"
-                value={environmentFilter}
-                onChange={(e) => onEnvironmentFilterChange(e.target.value)}
-              >
-                <option value="all">
-                  {isEn ? "Global (All audited analogs)" : "Global (Todos los análogos auditados)"}
-                </option>
-                <option value="altiplano">
-                  {isEn
-                    ? "High-Altitude Andean Altiplano (Bolivia / Chile >3,600 m)"
-                    : "Altiplano Andino de Gran Altitud (Bolivia / Chile >3,600 msnm)"}
-                </option>
-                <option value="hyperarid">
-                  {isEn
-                    ? "Hyperarid Deserts (Atacama Yungay)"
-                    : "Desiertos Hiperáridos (Atacama Yungay)"}
-                </option>
-                <option value="polar">
-                  {isEn
-                    ? "Polar & Cryogenic Regions (Antarctica McMurdo / Arctic)"
-                    : "Regiones Polares y Criogénicas (Antártida McMurdo / Ártico)"}
-                </option>
-                <option value="volcanic">
-                  {isEn
-                    ? "Volcanic Fields & Basaltic Tubes (Lanzarote / Lípez)"
-                    : "Campos Volcánicos y Tubos Basálticos (Lanzarote / Lípez)"}
-                </option>
-              </select>
+              {isMoon ? (
+                /* Moon Mission Objectives */
+                <select
+                  className="bloom-select"
+                  value={roleFilter}
+                  onChange={(e) => onRoleFilterChange(e.target.value)}
+                >
+                  <option value="all">
+                    {isEn
+                      ? "All lunar exploration objectives (Artemis)"
+                      : "Todos los objetivos de exploración lunar (Artemis)"}
+                  </option>
+                  <option value="landing">
+                    {isEn
+                      ? "Safe Landing Sites & Altimeter Calibration (TRN / Laser Altimetry)"
+                      : "Sitios de Aterrizaje y Calibración Altimétrica (TRN / Altimetría Láser)"}
+                  </option>
+                  <option value="base">
+                    {isEn
+                      ? "Permanent Lunar Base Siting & Cosmic Radiation Shielding"
+                      : "Base Lunar Permanente y Blindaje contra Radiación Cósmica"}
+                  </option>
+                  <option value="isru">
+                    {isEn
+                      ? "Cryogenic Ice Traps & Volatiles Mining (Polar ISRU)"
+                      : "Trampas de Hielo Criogénico y Minería de Volátiles (ISRU Polar)"}
+                  </option>
+                  <option value="caves">
+                    {isEn
+                      ? "Subterranean Exploration & Volcanic Skylights (Lava Tubes)"
+                      : "Exploración Subterránea y Claraboyas Volcánicas (Tubos de Lava)"}
+                  </option>
+                  <option value="mobility">
+                    {isEn
+                      ? "Wheel Terradynamics & Lunar Rover Mobility"
+                      : "Terradinámica de Ruedas y Movilidad de Rovers Lunares"}
+                  </option>
+                </select>
+              ) : (
+                /* Mars Mission Objectives */
+                <select
+                  className="bloom-select"
+                  value={roleFilter}
+                  onChange={(e) => onRoleFilterChange(e.target.value)}
+                >
+                  <option value="all">
+                    {isEn
+                      ? "All Martian exploration objectives"
+                      : "Todos los objetivos de exploración marciana"}
+                  </option>
+                  <option value="landing">
+                    {isEn
+                      ? "Autonomous EDL Landing & Descent (Topography & Optical Navigation)"
+                      : "Aterrizaje y Descenso Autónomo EDL (Topografía y Navegación Óptica)"}
+                  </option>
+                  <option value="astrobiology">
+                    {isEn
+                      ? "Astrobiology & Hydrothermal Silica (Biosignatures in Ancient Basins)"
+                      : "Astrobiología y Sílice Hidrotermal (Biofirmas en Cuencas Antiguas)"}
+                  </option>
+                  <option value="isru">
+                    {isEn
+                      ? "Subsurface Ice Extraction & In-Situ Water Resources (ISRU)"
+                      : "Hielo Subsuperficial y Recursos Hídricos ISRU"}
+                  </option>
+                  <option value="caves">
+                    {isEn
+                      ? "Subterranean Shelters & Martian Volcanic Cavities"
+                      : "Refugios Subterráneos y Cavidades Volcánicas Marcianas"}
+                  </option>
+                  <option value="mobility">
+                    {isEn
+                      ? "Wheel Terradynamics in Aeolian Dunes & Soft Regolith"
+                      : "Terradinámica en Dunas Eólicas y Suelos Blandos"}
+                  </option>
+                </select>
+              )}
             </div>
           </div>
 
-          {/* Quick Filter Recommendation Pills */}
-          <div className="bloom-quick-tags">
-            <span
-              style={{
-                fontSize: "0.6875rem",
-                color: "rgba(255,255,255,0.45)",
-                alignSelf: "center",
-                marginRight: "0.25rem",
-              }}
-            >
-              {isEn ? "Quick filter:" : "Filtro rápido:"}
-            </span>
-            <button
-              type="button"
-              className={`bloom-quick-pill ${roleFilter === "landing" ? "active" : ""}`}
-              onClick={() => handleQuickTag("landing")}
-            >
-              {isEn ? "Safe Landing" : "Aterrizaje Seguro"}
-            </button>
-            <button
-              type="button"
-              className={`bloom-quick-pill ${roleFilter === "base" ? "active" : ""}`}
-              onClick={() => handleQuickTag("base")}
-            >
-              {isEn ? "Permanent Base" : "Base Permanente"}
-            </button>
-            <button
-              type="button"
-              className={`bloom-quick-pill ${roleFilter === "isru" ? "active" : ""}`}
-              onClick={() => handleQuickTag("isru")}
-            >
-              {isEn ? "ISRU Mining" : "Extracción ISRU"}
-            </button>
-            <button
-              type="button"
-              className={`bloom-quick-pill ${roleFilter === "caves" ? "active" : ""}`}
-              onClick={() => handleQuickTag("caves")}
-            >
-              {isEn ? "Lava Tubes" : "Tubos de Lava"}
-            </button>
-            <button
-              type="button"
-              className={`bloom-quick-pill ${roleFilter === "mobility" ? "active" : ""}`}
-              onClick={() => handleQuickTag("mobility")}
-            >
-              {isEn ? "Rover Wheels" : "Ruedas de Rover"}
-            </button>
-          </div>
-
-          {/* Counter Banner */}
+          {/* Dynamic Match Counter Banner */}
           <div className="bloom-counter-row">
             <div>
               <span className="bloom-counter-dot" />
-              <strong>{matchCount} de 15</strong>{" "}
-              {isMoon
+              <strong>{matchCount}</strong>{" "}
+              {matchCount === 1
                 ? isEn
-                  ? "analogs qualified for the Moon (Artemis)"
-                  : "análogos calificados para la Luna (Artemis)"
+                  ? "Earth analog identified"
+                  : "análogo terrestre descubierto"
                 : isEn
-                ? "analogs qualified for Planet Mars"
-                : "análogos calificados para el Planeta Marte"}
+                ? "Earth analogs identified"
+                : "análogos terrestres descubiertos"}
             </div>
             <div style={{ fontFamily: "var(--font-mono, monospace)" }}>
               {isEn ? "Average fidelity:" : "Fidelidad promedio:"} <strong>{avgScore}%</strong>
             </div>
           </div>
+
+          {/* Informational Context */}
           <p
             style={{
               fontSize: "0.75rem",
-              color: "rgba(255, 255, 255, 0.65)",
+              color: "rgba(255, 255, 255, 0.68)",
               margin: "0.2rem 0 0.75rem 0",
-              lineHeight: "1.4",
+              lineHeight: "1.45",
               textAlign: "left",
             }}
           >
             {isMoon
               ? isEn
-                ? "ℹ Verified catalog: 8 of the 15 global Earth analogs meet strict lunar criteria (basaltic regolith, lava tubes, cryogenic volatiles, or impact craters). The other 7 are Mars-exclusive."
-                : "ℹ Catálogo verificado: 8 de los 15 análogos globales cumplen criterios estrictos lunares (regolito basáltico, tubos de lava, volátiles criogénicos o impactos). Los otros 7 son exclusivos de Marte."
+                ? "ℹ AnalogX correlates NASA LRO LOLA, Kaguya LALT, and Earth satellite data (ICESat, CryoSat-2, Sentinel) to pinpoint the matching Earth analog for your selected objective."
+                : "ℹ AnalogX correlaciona datos de NASA LRO LOLA, Kaguya LALT y misiones satelitales terrestres (ICESat, CryoSat-2, Sentinel) para ubicar el análogo terrestre exacto según el objetivo seleccionado."
               : isEn
-              ? "ℹ Verified catalog: 12 of the 15 global Earth analogs meet Martian criteria (perchlorates, hydrothermal, paleolakes, or aeolian dunes)."
-              : "ℹ Catálogo verificado: 12 de los 15 análogos globales cumplen criterios marcianos (percloratos, hidrotermalismo, paleocuencas salinas o dunas eólicas)."}
+              ? "ℹ AnalogX correlates MRO HiRISE, CRISM, Mars Express, and Earth satellite data to pinpoint the matching Earth analog for your selected objective."
+              : "ℹ AnalogX correlaciona datos de MRO HiRISE, CRISM, Mars Express y misiones satelitales terrestres para ubicar el análogo terrestre exacto según el objetivo seleccionado."}
           </p>
 
           {/* Strong Primary Action Button */}
           <button type="button" className="bloom-cta-btn" onClick={onApplyFilters}>
             <span>
-              {isEn ? "APPLY FILTERS & ANALYZE ANALOGS" : "APLICAR FILTROS Y ANALIZAR ANÁLOGOS"}
+              {isEn ? "APPLY FILTER & ANALYZE ANALOGS" : "APLICAR FILTRO Y ANALIZAR ANÁLOGOS"}
             </span>
             <span style={{ fontSize: "1.1rem" }}>↓</span>
           </button>
@@ -429,7 +354,7 @@ export function BloomHeroFilter({
           </span>
           <span style={{ marginLeft: "1rem" }}>
             {isEn
-              ? "Identifying the untapped potential of the Altiplano and extreme Earth environments."
+              ? "Identifying the untapped potential of the Andean Altiplano and extreme Earth environments."
               : "Identificando el potencial inexplorado del Altiplano y regiones extremas terrestres."}
           </span>
         </div>

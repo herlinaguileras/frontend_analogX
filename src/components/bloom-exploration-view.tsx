@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { getSpaceProfile, scienceDossierList } from "@/lib/analog-science-dossier";
 import { useLanguage } from "@/context/language-context";
 import { BloomHeroFilter } from "./bloom-hero-filter";
-import { DualWorldComparator } from "./dual-world-comparator";
 import { BloomGeologyComparison } from "./bloom-geology-comparison";
 import { BloomOfficialReport } from "./bloom-official-report";
 
@@ -29,23 +28,30 @@ export function BloomExplorationView({
   // Global synchronized language state
   const { lang, toggleLang } = useLanguage();
 
-  const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [conditionFilter, setConditionFilter] = useState<string>("all");
-  const [environmentFilter, setEnvironmentFilter] = useState<string>("all");
+  // Single coherent operational mission filter (tailored to Moon or Mars)
+  const [roleFilter, setRoleFilter] = useState<string>("landing");
+  // Scroll is strictly locked until user clicks "Aplicar filtro"
   const [filtersApplied, setFiltersApplied] = useState<boolean>(Boolean(initialMatchedRegion));
   const [selectedAnalogId, setSelectedAnalogId] = useState<string | null>(
     initialMatchedRegion?.id ?? null
   );
 
-  const hasActiveFilters =
-    roleFilter !== "all" || conditionFilter !== "all" || environmentFilter !== "all";
-  const showResults = filtersApplied || hasActiveFilters;
+  // Lock scrolling when filters haven't been applied
+  useEffect(() => {
+    if (!filtersApplied) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+      document.documentElement.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+      document.documentElement.style.overflow = "auto";
+    };
+  }, [filtersApplied]);
 
-  const bodyAnalogsCount = useMemo(() => {
-    return scienceDossierList.filter((item) => Boolean(getSpaceProfile(item, body))).length;
-  }, [body]);
-
-  // Filter analogs based on selections
+  // Filter analogs based on active planetary body and mission objective
   const filteredAnalogs = useMemo(() => {
     return scienceDossierList
       .filter((item) => {
@@ -58,30 +64,20 @@ export function BloomExplorationView({
           return false;
         }
 
-        // Physical condition filter
-        if (conditionFilter !== "all" && !item.physicalConditions.includes(conditionFilter)) {
-          return false;
-        }
-
-        // Environment type filter
-        if (environmentFilter !== "all" && item.environmentType !== environmentFilter) {
-          return false;
-        }
-
         return true;
       })
       .sort((a, b) => b.fidelityScore - a.fidelityScore);
-  }, [body, roleFilter, conditionFilter, environmentFilter]);
+  }, [body, roleFilter]);
 
-  // Show only one selected analog comparison at a time among filtered results
+  // Active analog for comparison and technical dossier
   const activeAnalog = useMemo(() => {
-    if (!showResults || filteredAnalogs.length === 0) return null;
+    if (filteredAnalogs.length === 0) return null;
     if (selectedAnalogId) {
       const match = filteredAnalogs.find((item) => item.id === selectedAnalogId);
       if (match) return match;
     }
     return filteredAnalogs[0] ?? null;
-  }, [showResults, filteredAnalogs, selectedAnalogId]);
+  }, [filteredAnalogs, selectedAnalogId]);
 
   const avgScore = useMemo(() => {
     if (filteredAnalogs.length === 0) return 0;
@@ -90,10 +86,12 @@ export function BloomExplorationView({
   }, [filteredAnalogs]);
 
   const scrollToComparison = () => {
-    const el = document.getElementById("analisis-analogos");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    setTimeout(() => {
+      const el = document.getElementById("analisis-analogos");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 60);
   };
 
   const handleApplyFilters = () => {
@@ -101,25 +99,17 @@ export function BloomExplorationView({
     scrollToComparison();
   };
 
-  const handleQuickFilter = (role: string) => {
-    setRoleFilter(role);
-    setConditionFilter("all");
-    setEnvironmentFilter("all");
-    setSelectedAnalogId(null);
-    setFiltersApplied(true);
-  };
-
-  const handleResetFilters = () => {
-    setRoleFilter("all");
-    setConditionFilter("all");
-    setEnvironmentFilter("all");
-    setFiltersApplied(false);
-    setSelectedAnalogId(null);
-  };
-
   return (
-    <main className="bloom-exploration-page" style={{ background: "#050609", color: "#fff" }}>
-      {/* 1. Fullscreen Hero with 3D Rotating Globe, Active Mission Badge, Translator & Liquid Glass Modal */}
+    <main
+      className="bloom-exploration-page"
+      style={{
+        background: "#050609",
+        color: "#fff",
+        height: !filtersApplied ? "100vh" : "auto",
+        overflow: !filtersApplied ? "hidden" : "visible",
+      }}
+    >
+      {/* 1. Fullscreen Hero with 3D Rotating Globe, Active Mission Badge, Translator & Filter Modal */}
       <BloomHeroFilter
         body={body}
         roleFilter={roleFilter}
@@ -127,17 +117,6 @@ export function BloomExplorationView({
           setRoleFilter(val);
           setSelectedAnalogId(null);
         }}
-        conditionFilter={conditionFilter}
-        onConditionFilterChange={(val) => {
-          setConditionFilter(val);
-          setSelectedAnalogId(null);
-        }}
-        environmentFilter={environmentFilter}
-        onEnvironmentFilterChange={(val) => {
-          setEnvironmentFilter(val);
-          setSelectedAnalogId(null);
-        }}
-        onQuickFilter={handleQuickFilter}
         matchCount={filteredAnalogs.length}
         avgScore={avgScore}
         onApplyFilters={handleApplyFilters}
@@ -145,47 +124,29 @@ export function BloomExplorationView({
         onToggleLang={toggleLang}
       />
 
-      {/* 2. Interactive 1:1 Dual-World Terrain Comparator (Split Scrubber) */}
-      <div style={{ maxWidth: "1380px", margin: "0 auto", padding: "0 2rem" }}>
-        <DualWorldComparator
-          targetBody={body}
-          initialPresetId={body === "Mars" ? "jezero-atacama" : "shackleton-mcmurdo"}
-          lang={lang}
-        />
-      </div>
+      {/* 2. Content below is unlocked ONLY when user clicks "APLICAR FILTRO Y ANALIZAR ANÁLOGOS" */}
+      {filtersApplied && (
+        <>
+          {/* Side-by-Side Geology & Climate Comparison (Filtered specifically to selected objective) */}
+          <BloomGeologyComparison
+            analogs={filteredAnalogs}
+            activeAnalog={activeAnalog}
+            onSelectAnalog={setSelectedAnalogId}
+            body={body}
+            roleFilter={roleFilter}
+            lang={lang}
+          />
 
-      {/* 3. Side-by-Side Geology & Climate Comparison (Filtered, One Analog at a Time) */}
-      <BloomGeologyComparison
-        analogs={filteredAnalogs}
-        activeAnalog={activeAnalog}
-        onSelectAnalog={setSelectedAnalogId}
-        hasAppliedFilters={showResults}
-        totalBodyCount={bodyAnalogsCount}
-        onApplyFilters={handleApplyFilters}
-        onQuickFilter={(role) => {
-          handleQuickFilter(role);
-          scrollToComparison();
-        }}
-        body={body}
-        roleFilter={roleFilter}
-        conditionFilter={conditionFilter}
-        environmentFilter={environmentFilter}
-        onResetFilters={handleResetFilters}
-        lang={lang}
-      />
-
-      {/* 3. Official NASA Space Apps Qualification Dossier & Printable Report (Only shown after filtering) */}
-      {showResults && filteredAnalogs.length > 0 && (
-        <BloomOfficialReport
-          analogs={filteredAnalogs}
-          activeAnalogId={activeAnalog?.id ?? null}
-          onSelectAnalog={(id) => {
-            setSelectedAnalogId(id);
-            scrollToComparison();
-          }}
-          body={body}
-          lang={lang}
-        />
+          {/* Official Scientific Qualification Dossier (Exclusive to the selected/active analog) */}
+          <BloomOfficialReport
+            analogs={filteredAnalogs}
+            activeAnalog={activeAnalog}
+            onSelectAnalog={setSelectedAnalogId}
+            body={body}
+            roleFilter={roleFilter}
+            lang={lang}
+          />
+        </>
       )}
     </main>
   );
