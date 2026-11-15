@@ -1,6 +1,6 @@
 "use client";
 
-import type { GeologyComparisonItem } from "@/lib/analog-science-dossier";
+import { getSpaceProfile, type GeologyComparisonItem } from "@/lib/analog-science-dossier";
 import { analogTranslationsEn, type SupportedLang } from "@/lib/translations";
 
 interface BloomGeologyComparisonProps {
@@ -152,6 +152,9 @@ export function BloomGeologyComparison({
 
       {/* List of Analog Dossiers */}
       {analogs.map((item) => {
+        const spaceProfile = getSpaceProfile(item, body);
+        if (!spaceProfile) return null;
+
         const trans = isEn ? analogTranslationsEn[item.id] : null;
 
         const earthImgTitle = trans?.earthImageTitle ?? item.earthImageTitle;
@@ -159,10 +162,13 @@ export function BloomGeologyComparison({
         const earthGeologySummary = trans?.earthGeologySummary ?? item.earthGeologySummary;
         const earthMineralogy = trans?.earthMineralogy ?? item.earthMineralogy;
 
-        const spaceImgTitle = trans?.spaceImageTitle ?? item.spaceImageTitle;
-        const spaceImgSubtitle = trans?.spaceImageSubtitle ?? item.spaceImageSubtitle;
-        const spaceGeologySummary = trans?.spaceGeologySummary ?? item.spaceGeologySummary;
-        const spaceMineralogy = trans?.spaceMineralogy ?? item.spaceMineralogy;
+        const spaceTargetName = spaceProfile.targetName;
+        const spaceImage = spaceProfile.image;
+        const spaceImgTitle = trans?.spaceImageTitle ?? spaceProfile.imageTitle;
+        const spaceImgSubtitle = trans?.spaceImageSubtitle ?? spaceProfile.imageSubtitle;
+        const spaceCoords = spaceProfile.coordinates;
+        const spaceGeologySummary = trans?.spaceGeologySummary ?? spaceProfile.geologySummary;
+        const spaceMineralogy = trans?.spaceMineralogy ?? spaceProfile.mineralogy;
 
         const execSummary = trans?.executiveSummary ?? item.executiveSummary;
         const solidAnalogy = trans?.solidAnalogy ?? item.solidAnalogy;
@@ -251,14 +257,14 @@ export function BloomGeologyComparison({
                     : isEn
                     ? "🪐 Martian Geology · "
                     : "🪐 Geología Marciana · "}
-                  {item.spaceTargetName}
+                  {spaceTargetName}
                 </span>
 
                 <div className="bloom-geology-image-frame">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={item.spaceImage}
-                    alt={`Geología espacial de ${item.spaceTargetName}`}
+                    src={spaceImage}
+                    alt={`Geología espacial de ${spaceTargetName}`}
                     loading="lazy"
                   />
                 </div>
@@ -266,7 +272,7 @@ export function BloomGeologyComparison({
                 <div className="bloom-geology-info">
                   <h4>{spaceImgTitle}</h4>
                   <div className="bloom-geology-subtitle">
-                    {spaceImgSubtitle} ({item.spaceTargetCoordinates})
+                    {spaceImgSubtitle} ({spaceCoords})
                   </div>
                   <p className="bloom-geology-text">{spaceGeologySummary}</p>
                 </div>

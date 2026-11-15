@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { scienceDossierList } from "@/lib/analog-science-dossier";
+import { getSpaceProfile, scienceDossierList } from "@/lib/analog-science-dossier";
 import type { SupportedLang } from "@/lib/translations";
 import { BloomHeroFilter } from "./bloom-hero-filter";
+import { DualWorldComparator } from "./dual-world-comparator";
 import { BloomGeologyComparison } from "./bloom-geology-comparison";
 import { BloomOfficialReport } from "./bloom-official-report";
 
@@ -30,10 +31,9 @@ export function BloomExplorationView({
   const filteredAnalogs = useMemo(() => {
     return scienceDossierList
       .filter((item) => {
-        // Target body match (Moon, Mars, or Both)
-        if (item.missionTarget !== "Both" && item.missionTarget !== body) {
-          return false;
-        }
+        // Target body match: must have a specific profile for this body (Moon or Mars)
+        const profile = getSpaceProfile(item, body);
+        if (!profile) return false;
 
         // Operational role filter
         if (roleFilter !== "all" && !item.operationalRoles.includes(roleFilter)) {
@@ -96,7 +96,15 @@ export function BloomExplorationView({
         onToggleLang={handleToggleLang}
       />
 
-      {/* 2. Side-by-Side Geology Comparison & Deep Dive Scientific Analysis */}
+      {/* 2. Interactive 1:1 Dual-World Terrain Comparator (Split Scrubber) */}
+      <div style={{ maxWidth: "1380px", margin: "0 auto", padding: "0 2rem" }}>
+        <DualWorldComparator
+          initialPresetId={body === "Mars" ? "jezero-atacama" : "shackleton-mcmurdo"}
+          lang={lang}
+        />
+      </div>
+
+      {/* 3. Side-by-Side Geology Comparison & Deep Dive Scientific Analysis */}
       <BloomGeologyComparison
         analogs={filteredAnalogs}
         body={body}

@@ -7,7 +7,7 @@ const options = { signal: AbortSignal.timeout(10_000) };
 const cases = [
   { path: "/", text: "Otros mundos empiezan en la Tierra." },
   { path: "/earth", text: "Catálogo de Análogos Terrestres" },
-  { path: "/explore", text: "Tu exploración" },
+  { path: "/explore", text: "Dual-World Terrain Comparator" },
   { path: "/compare?region=sol-de-manana&body=Moon", text: "Objetivo por definir", region: "Sol de Mañana" },
   { path: "/compare?region=inexistente&body=invalid", text: "Terra Sirenum", region: "Salar de Uyuni" },
   { path: "/methodology", text: "La evidencia antes" },

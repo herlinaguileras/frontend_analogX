@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AsciiGlobe } from "@/components/ascii-globe";
 import { Icon } from "@/components/icon";
 import { MissionPortalCards } from "@/components/mission-portal-cards";
+import { DualWorldComparator } from "@/components/dual-world-comparator";
 
 export default function HomePage() {
   return (
@@ -37,7 +38,7 @@ export default function HomePage() {
 
             <div className="vana-telemetry-row">
               <div className="telemetry-item">
-                <strong>09</strong>
+                <strong>15</strong>
                 <span>Análogos Terrestres</span>
               </div>
               <div className="telemetry-sep">/</div>
@@ -80,6 +81,13 @@ export default function HomePage() {
         </div>
 
         <MissionPortalCards />
+      </section>
+
+      {/* =========================================================================
+          SECCIÓN: COMPARADOR TOPOGRÁFICO DUAL INTERACTIVO 1:1 (SPLIT SCRUBBER)
+          ========================================================================= */}
+      <section className="dual-comparator-home-section" style={{ maxWidth: "1380px", margin: "1rem auto 3rem", padding: "0 2rem" }}>
+        <DualWorldComparator initialPresetId="jezero-atacama" lang="es" />
       </section>
 
       {/* =========================================================================

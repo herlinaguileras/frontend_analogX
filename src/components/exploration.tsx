@@ -278,7 +278,7 @@ export function Exploration({
           <span>OBJETIVO ACTIVO: <strong>{body === "Moon" ? "LUNA · PROGRAMA ARTEMIS (POLO SUR / SHACKLETON)" : "MARTE · EXPLORACIÓN PLANETARIA (JEZERO / GALE / SIRENUM)"}</strong></span>
         </div>
         <span className="telemetry-meta">
-          9 REGIONES MUNDIALES DISPONIBLES · MAPA SATELITAL 360° ACTIVO
+          15 REGIONES MUNDIALES DISPONIBLES · MAPA SATELITAL 360° ACTIVO
         </span>
       </div>
 
