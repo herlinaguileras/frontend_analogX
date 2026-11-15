@@ -20,6 +20,24 @@ import type {
   VerificationStatus,
 } from "./scientific-types";
 import { planetaryTargets, studyRegions } from "./study-catalog";
+import {
+  evaluateCustomProbeOffline,
+  type ProbeAtmosphericComparison,
+  type ProbeCoordinates,
+  type ProbeEvaluateResponse,
+  type ProbeGravityComparison,
+  type ProbeMatchedTarget,
+  type ProbeSubsystems,
+} from "./dynamic-comparator";
+
+export type {
+  ProbeAtmosphericComparison,
+  ProbeCoordinates,
+  ProbeEvaluateResponse,
+  ProbeGravityComparison,
+  ProbeMatchedTarget,
+  ProbeSubsystems,
+};
 
 export interface ListResponse<T> {
   items: T[];
@@ -644,3 +662,25 @@ export async function fetchHabitatShielding(earthRegionId: string): Promise<Habi
     return createFallbackHabitat(earthRegionId);
   }
 }
+
+export async function probeCoordinate(
+  lat: number,
+  lon: number,
+  preferredBody: "Moon" | "Mars" | "Auto" = "Auto"
+): Promise<ProbeEvaluateResponse> {
+  const baseUrl = getApiBaseUrl();
+  try {
+    const res = await fetch(`${baseUrl}/api/probe/evaluate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({ lat, lon, preferred_body: preferredBody }),
+      signal: AbortSignal.timeout(4000),
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch {
+    return evaluateCustomProbeOffline(lat, lon, preferredBody);
+  }
+}
+

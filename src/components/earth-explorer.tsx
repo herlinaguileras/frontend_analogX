@@ -11,6 +11,8 @@ import {
 } from "@/lib/earth-catalog";
 import { regionPreviewUrl } from "@/lib/map-config";
 import { useLanguage } from "@/context/language-context";
+import { probeCoordinate, type ProbeEvaluateResponse } from "@/lib/api";
+import { CustomProbeDossier } from "./custom-probe-dossier";
 import { Icon } from "./icon";
 import { CountryCombobox } from "./country-combobox";
 
@@ -35,7 +37,23 @@ export function EarthExplorer() {
   const [countryFilter, setCountryFilter] = useState<string>("all");
   const [isCardCollapsed, setIsCardCollapsed] = useState<boolean>(false);
   const [reportModalOpen, setReportModalOpen] = useState<boolean>(false);
+  const [probeResult, setProbeResult] = useState<ProbeEvaluateResponse | null>(null);
+  const [probeLoading, setProbeLoading] = useState<boolean>(false);
+  const [activeProbeCoords, setActiveProbeCoords] = useState<{ lat: number; lng: number } | null>(null);
   const viewportRef = useRef<HTMLElement>(null);
+
+  const handleProbeCoordinate = async (coords: { lat: number; lng: number }) => {
+    setActiveProbeCoords(coords);
+    setProbeLoading(true);
+    try {
+      const res = await probeCoordinate(coords.lat, coords.lng);
+      setProbeResult(res);
+    } catch (err) {
+      console.error("Error al sondear coordenada:", err);
+    } finally {
+      setProbeLoading(false);
+    }
+  };
 
   const handleFocusRegion = (regionId: string, scrollToGlobe = false) => {
     setSelectedId(regionId);
@@ -213,8 +231,28 @@ export function EarthExplorer() {
             activeProcess={activeProcess}
             countryFilter={countryFilter}
             onSelect={(id) => handleFocusRegion(id, false)}
+            onProbeCoordinate={handleProbeCoordinate}
+            activeProbeCoords={activeProbeCoords}
           />
         </div>
+
+        {/* Expediente Flotante de Sonda Libre (Point & Scan Telemetry) */}
+        {probeResult && (
+          <CustomProbeDossier
+            probeResult={probeResult}
+            loading={probeLoading}
+            onClose={() => {
+              setProbeResult(null);
+              setActiveProbeCoords(null);
+            }}
+            onOpenComparator={(targetId) => {
+              const compSection = document.getElementById("dual-world-comparator");
+              if (compSection) {
+                compSection.scrollIntoView({ behavior: "smooth" });
+              }
+            }}
+          />
+        )}
 
         {/* Tarjeta Flotante HUD de la Región Seleccionada (Solo información de la Tierra) */}
         <aside className={`floating-region-card ${isCardCollapsed ? "collapsed" : ""}`}>

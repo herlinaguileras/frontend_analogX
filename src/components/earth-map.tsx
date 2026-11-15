@@ -64,6 +64,8 @@ interface EarthMapProps {
   activeProcess: EarthProcessCategory;
   countryFilter: string;
   onSelect: (id: string) => void;
+  onProbeCoordinate?: (coords: { lat: number; lng: number }) => void;
+  activeProbeCoords?: { lat: number; lng: number } | null;
 }
 
 export default function EarthMap({
@@ -73,11 +75,15 @@ export default function EarthMap({
   activeProcess,
   countryFilter,
   onSelect,
+  onProbeCoordinate,
+  activeProbeCoords = null,
 }: EarthMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<maplibregl.Marker[]>([]);
+  const probeMarkerRef = useRef<maplibregl.Marker | null>(null);
   const onSelectRef = useRef(onSelect);
+  const onProbeCoordinateRef = useRef(onProbeCoordinate);
   const lastHandledFocusSeq = useRef(0);
   const previousCountry = useRef(countryFilter);
   const basemapRef = useRef<ExtendedBasemapId>("satellite");
@@ -87,10 +93,15 @@ export default function EarthMap({
   const [basemap, setBasemap] = useState<ExtendedBasemapId>("satellite");
   const [zoom, setZoom] = useState(1.8);
   const [cursorCoords, setCursorCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [probeModeActive, setProbeModeActive] = useState(false);
 
   useEffect(() => {
     onSelectRef.current = onSelect;
   }, [onSelect]);
+
+  useEffect(() => {
+    onProbeCoordinateRef.current = onProbeCoordinate;
+  }, [onProbeCoordinate]);
 
   const activeColorMeta = processFilters.find(p => p.id === activeProcess) ?? processFilters[0]!;
   const markerColor = activeColorMeta.color;
@@ -149,6 +160,12 @@ export default function EarthMap({
 
     map.on("mousemove", (e) => {
       setCursorCoords({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+    });
+
+    map.on("click", (e) => {
+      if (onProbeCoordinateRef.current) {
+        onProbeCoordinateRef.current({ lat: e.lngLat.lat, lng: e.lngLat.lng });
+      }
     });
 
     const resize = new ResizeObserver(() => map.resize());
@@ -227,6 +244,47 @@ export default function EarthMap({
       markersRef.current.push(marker);
     }
   }, [visibleRegions, selectedId, ready, markerColor]);
+
+  // Marcador de Sonda Libre Dinámica (Custom Probe Beacon)
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+
+    if (probeMarkerRef.current) {
+      probeMarkerRef.current.remove();
+      probeMarkerRef.current = null;
+    }
+
+    if (activeProbeCoords) {
+      const el = document.createElement("div");
+      el.className = "custom-probe-marker";
+      el.innerHTML = `
+        <span class="probe-marker-pulse"></span>
+        <span class="probe-marker-crosshair"></span>
+      `;
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: "center",
+        opacityWhenCovered: "0",
+      })
+        .setLngLat([activeProbeCoords.lng, activeProbeCoords.lat])
+        .addTo(map);
+
+      probeMarkerRef.current = marker;
+    }
+  }, [activeProbeCoords, ready]);
+
+  // Cursor del mapa en modo sonda
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const canvas = map.getCanvas();
+    if (probeModeActive) {
+      canvas.style.cursor = "crosshair";
+    } else {
+      canvas.style.cursor = "";
+    }
+  }, [probeModeActive]);
 
   // Vuelo explícito hacia una región seleccionada (clic en tarjeta o marcador)
   useEffect(() => {
@@ -401,6 +459,24 @@ export default function EarthMap({
           onClick={() => mapRef.current?.resetNorth({ duration: 500 })}
         >
           <span className="compass-icon">N↑</span>
+        </button>
+        <div className="nav-btn-divider" />
+        <button
+          type="button"
+          className={`map-nav-btn ${probeModeActive ? "probe-active" : ""}`}
+          aria-label={isEn ? "Point & Scan: Free Planetary Probe" : "Sondeo Libre: Prospección Planetaria"}
+          title={
+            probeModeActive
+              ? isEn
+                ? "Deactivate Probe Mode"
+                : "Desactivar Modo Sonda"
+              : isEn
+              ? "Point & Scan: Click anywhere on Earth to compare with Moon/Mars"
+              : "Sondeo Libre: Haz clic en cualquier punto de la Tierra para comparar con Luna/Marte"
+          }
+          onClick={() => setProbeModeActive((prev) => !prev)}
+        >
+          <span style={{ fontSize: "14px" }}>🛰️</span>
         </button>
       </div>
 

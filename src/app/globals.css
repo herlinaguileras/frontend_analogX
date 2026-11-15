@@ -6595,3 +6595,506 @@ tbody tr:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================================
+   CUSTOM PLANETARY PROBE (POINT & SCAN HUD)
+   ========================================================================= */
+
+.maplibregl-marker.custom-probe-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.custom-probe-marker.maplibregl-marker-covered {
+  opacity: 0 !important;
+  visibility: hidden;
+}
+
+.probe-marker-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 20px #38bdf8;
+  animation: probe-radar-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.probe-marker-crosshair {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 16px #38bdf8, 0 0 30px rgba(56, 189, 248, 0.6);
+}
+
+.probe-marker-crosshair::before,
+.probe-marker-crosshair::after {
+  content: "";
+  position: absolute;
+  background: #38bdf8;
+}
+
+.probe-marker-crosshair::before {
+  top: -6px;
+  left: 4px;
+  width: 2px;
+  height: 22px;
+}
+
+.probe-marker-crosshair::after {
+  top: 4px;
+  left: -6px;
+  width: 22px;
+  height: 2px;
+}
+
+@keyframes probe-radar-ping {
+  0% { transform: translate(-50%, -50%) scale(0.4); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+
+/* Botón Conmutador de Sonda en los Controles del Mapa */
+.earth-map-controls .map-control-btn.probe-active {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+}
+
+/* Tarjeta Flotante HUD del Expediente de Sonda */
+.custom-probe-dossier-card {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  width: min(440px, calc(100% - 40px));
+  max-height: calc(100% - 90px);
+  background: rgba(10, 14, 23, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 25;
+  overflow-y: auto;
+  color: #f1f5f9;
+}
+
+.probe-dossier-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: rgba(15, 23, 42, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.probe-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.probe-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.probe-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #38bdf8;
+  animation: pulse-dot 1.2s infinite;
+}
+
+.probe-surface-badge {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid;
+}
+
+.probe-coords-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.probe-zone-subtitle {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  margin: 2px 0 0;
+}
+
+.probe-biome-tag {
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.probe-close-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.probe-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.probe-dossier-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.probe-main-metrics-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.probe-score-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1.5px solid;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.probe-score-number {
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-family: var(--font-mono, monospace);
+  line-height: 1;
+}
+
+.probe-score-label {
+  display: block;
+  font-size: 9px;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.7px;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.probe-confidence-pill {
+  font-size: 9px;
+  font-family: var(--font-mono, monospace);
+  color: #64748b;
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+}
+
+.probe-matched-target-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+}
+
+.target-card-eyebrow {
+  font-size: 9px;
+  font-family: var(--font-mono, monospace);
+  color: #94a3b8;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.target-card-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.target-thumb-img {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.target-text-info h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.25;
+}
+
+.target-instrument-tag {
+  font-size: 0.6875rem;
+  font-family: var(--font-mono, monospace);
+  color: #94a3b8;
+  margin: 3px 0 0;
+}
+
+.target-feature-badge {
+  display: inline-block;
+  font-size: 9.5px;
+  font-family: var(--font-mono, monospace);
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-top: 4px;
+}
+
+/* Subsistemas */
+.subsystem-section-heading {
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.probe-subsystems-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.subsystem-meter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meter-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+.meter-label-row strong {
+  font-family: var(--font-mono, monospace);
+}
+
+.meter-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease-out;
+}
+
+/* Física Divergente */
+.probe-physics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.physics-card {
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 5px;
+}
+
+.physics-card h6 {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 4px;
+}
+
+.physics-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-family: var(--font-mono, monospace);
+  color: #e2e8f0;
+  margin-bottom: 4px;
+}
+
+.physics-stat-row .stat-arrow {
+  color: #38bdf8;
+}
+
+.physics-notice-text {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.35;
+  margin: 0;
+}
+
+/* Limitaciones y Auditoría */
+.probe-limitations-box {
+  padding: 12px;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  border-radius: 5px;
+}
+
+.probe-limitations-box h6 {
+  font-size: 10px;
+  font-family: var(--font-mono, monospace);
+  color: #facc15;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin: 0 0 6px;
+}
+
+.probe-limitations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.probe-limitations-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  color: #cbd5e1;
+  line-height: 1.35;
+}
+
+.limitation-bullet-icon {
+  font-size: 10px;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+.epistemological-quote {
+  font-size: 10.5px;
+  color: #94a3b8;
+  border-left: 2px solid #38bdf8;
+  padding-left: 8px;
+  margin-bottom: 6px;
+  line-height: 1.35;
+}
+
+.rehearsal-recommendation {
+  font-size: 11px;
+  color: #e2e8f0;
+  line-height: 1.35;
+}
+
+/* Footer Botones */
+.probe-action-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.probe-btn {
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.probe-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+}
+
+.probe-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.probe-btn-primary {
+  flex: 1;
+  background: #38bdf8;
+  border: 1px solid #38bdf8;
+  color: #020617;
+  font-weight: 700;
+  text-align: center;
+}
+
+.probe-btn-primary:hover {
+  background: #7dd3fc;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+@media (max-width: 600px) {
+  .custom-probe-dossier-card {
+    top: auto;
+    bottom: 10px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-height: 65vh;
+  }
+  .probe-main-metrics-row {
+    grid-template-columns: 1fr;
+  }
+}
+
