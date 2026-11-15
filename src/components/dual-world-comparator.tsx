@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { SupportedLang } from "@/lib/translations";
+import { getClimateComparison } from "@/lib/climate-science-engine";
 
 export interface DualWorldPreset {
   id: string;
@@ -10,6 +11,7 @@ export interface DualWorldPreset {
   fidelityIndex: number;
   verifiedPercent: number;
   spatialResolution: string;
+  earthRegionId: string;
   planetaryTarget: {
     name: string;
     subtitle: string;
@@ -43,6 +45,7 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
     fidelityIndex: 88.1,
     verifiedPercent: 91,
     spatialResolution: "10m",
+    earthRegionId: "atacama-yungay",
     planetaryTarget: {
       name: "Cráter Jezero (Delta Occidental)",
       subtitle: "Abanico Aluvial de Neretva Vallis (Marte)",
@@ -81,6 +84,7 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
     fidelityIndex: 84.6,
     verifiedPercent: 94,
     spatialResolution: "20m",
+    earthRegionId: "mcmurdo-dry-valleys",
     planetaryTarget: {
       name: "Borde de Cráter Shackleton (PSR)",
       subtitle: "Trampas Criogénicas en Sombra Permanente (Polo Sur Lunar)",
@@ -119,6 +123,7 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
     fidelityIndex: 89.3,
     verifiedPercent: 92,
     spatialResolution: "5m",
+    earthRegionId: "tubos-lava-lanzarote",
     planetaryTarget: {
       name: "Claraboya y Tubos de Marius Hills",
       subtitle: "Fosa de Colapso Volcánico Lunar (Oceanus Procellarum)",
@@ -157,6 +162,7 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
     fidelityIndex: 86.8,
     verifiedPercent: 95,
     spatialResolution: "15m",
+    earthRegionId: "salar-de-uyuni",
     planetaryTarget: {
       name: "Paleocuenca Salina de Terra Sirenum",
       subtitle: "Depósitos de Cloruros Noéjicos (Tierras Altas de Marte)",
@@ -195,6 +201,7 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
     fidelityIndex: 82.5,
     verifiedPercent: 88,
     spatialResolution: "12m",
+    earthRegionId: "haughton-crater",
     planetaryTarget: {
       name: "Monte Sharp y Brechas de Gale",
       subtitle: "Estratigrafía de Impacto Complejo (Cráter Gale)",
@@ -239,7 +246,7 @@ export function DualWorldComparator({
 }: DualWorldComparatorProps) {
   const isEn = lang === "en";
   const [selectedPresetId, setSelectedPresetId] = useState<string>(initialPresetId);
-  const [activeTab, setActiveTab] = useState<"imagery" | "transect">("imagery");
+  const [activeTab, setActiveTab] = useState<"imagery" | "transect" | "climate">("imagery");
   const [splitPos, setSplitPos] = useState<number>(50);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
@@ -247,6 +254,7 @@ export function DualWorldComparator({
 
   const currentPreset =
     DUAL_WORLD_PRESETS.find((p) => p.id === selectedPresetId) ?? DUAL_WORLD_PRESETS[0]!;
+  const climateData = getClimateComparison(currentPreset.earthRegionId, currentPreset.body);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     setIsDragging(true);
@@ -388,6 +396,13 @@ export function DualWorldComparator({
           >
             <span>📈 {isEn ? "Elevation Transect" : "Transecto Altimétrico"}</span>
           </button>
+          <button
+            type="button"
+            className={`view-tab-btn ${activeTab === "climate" ? "active" : ""}`}
+            onClick={() => setActiveTab("climate")}
+          >
+            <span>🌡️ {isEn ? "Atmospheric & Climate Matrix" : "Matriz Climática y Atmosférica"}</span>
+          </button>
         </div>
       </div>
 
@@ -459,7 +474,7 @@ export function DualWorldComparator({
             </div>
           </div>
         </div>
-      ) : (
+      ) : activeTab === "transect" ? (
         /* Elevation Transect View */
         <div className="dual-transect-wrapper liquid-glass">
           <div className="transect-header">
@@ -555,6 +570,107 @@ export function DualWorldComparator({
             <div className="transect-stat-cell">
               <span>{isEn ? "Wheel Sinkage Risk" : "Riesgo de Atollamiento de Rueda"}</span>
               <strong style={{ color: "#7fd579" }}>{currentPreset.transect.sinkageRisk}</strong>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* CLIMATE & ATMOSPHERE COMPARISON TAB */
+        <div className="dual-climate-view">
+          <div className="dual-climate-header-summary">
+            <div className="dual-climate-title-group">
+              <h4>
+                {isEn
+                  ? "Planetary Atmosphere & Diurnal Thermal Contrast"
+                  : "Contraste Atmosférico y Régimen Térmico Diurno"}
+              </h4>
+              <p>
+                {isEn
+                  ? `Comparing extreme environments between ${currentPreset.planetaryTarget.name} and ${currentPreset.earthTwin.name}`
+                  : `Comparando entornos extremos entre ${currentPreset.planetaryTarget.name} y ${currentPreset.earthTwin.name}`}
+              </p>
+            </div>
+            <div className="dual-climate-fidelity-pill">
+              <span>⚡ {climateData.space.climateFidelityRating} {isEn ? "CLIMATE COMPATIBILITY" : "COMPATIBILIDAD CLIMÁTICA"}</span>
+            </div>
+          </div>
+
+          <div className="dual-climate-columns-grid">
+            {/* Space Column */}
+            <div className={`dual-climate-col space ${currentPreset.body === "Mars" ? "mars" : ""}`}>
+              <div className="col-header-tag">
+                <span>{currentPreset.body === "Mars" ? "🪐 ATMÓSFERA MARCIANA" : "🌕 EXOSFERA LUNAR"}</span>
+                <small>{currentPreset.planetaryTarget.instrument}</small>
+              </div>
+
+              <div className="climate-metrics-stack">
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Surface Temperature Cycle" : "Ciclo Térmico Superficial"}</span>
+                  <strong className="metric-value">{climateData.space.tempRange}</strong>
+                  <span className="metric-desc">{climateData.space.tempDescription}</span>
+                </div>
+
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Atmospheric Pressure & Density" : "Presión Atmosférica y Densidad"}</span>
+                  <strong className="metric-value">{climateData.space.atmosphericPressure}</strong>
+                  <span className="metric-desc">{climateData.space.pressureDescription}</span>
+                </div>
+
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Solar UV & Cosmic Radiation" : "Radiación Solar UV y Cósmica"}</span>
+                  <strong className="metric-value">{climateData.space.solarRadiationUv}</strong>
+                  <span className="metric-desc">{climateData.space.radiationDescription}</span>
+                </div>
+
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Humidity & Dust Dynamics" : "Humedad y Dinámica de Polvo"}</span>
+                  <strong className="metric-value">{climateData.space.relativeHumidity}</strong>
+                  <span className="metric-desc">{climateData.space.windEolianDynamics}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Earth Twin Column */}
+            <div className="dual-climate-col earth">
+              <div className="col-header-tag">
+                <span>🌍 ANÁLOGO TERRESTRE ({currentPreset.earthTwin.name})</span>
+                <small>{currentPreset.earthTwin.instrument}</small>
+              </div>
+
+              <div className="climate-metrics-stack">
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Earth Temperature Range" : "Rango Térmico Terrestre"}</span>
+                  <strong className="metric-value">{climateData.earth.tempRange}</strong>
+                  <span className="metric-desc">{climateData.earth.tempDayNight}</span>
+                </div>
+
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Local Barometric Pressure" : "Presión Barométrica Local"}</span>
+                  <strong className="metric-value">{climateData.earth.atmosphericPressure}</strong>
+                  <span className="metric-desc">{climateData.earth.atmosphericDensity}</span>
+                </div>
+
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Solar UV Index & Insolation" : "Índice UV Solar e Insolación"}</span>
+                  <strong className="metric-value" style={{ color: "#fbbf24" }}>{climateData.earth.uvIndex}</strong>
+                  <span className="metric-desc">{climateData.earth.solarInsolation}</span>
+                </div>
+
+                <div className="climate-metric-entry">
+                  <span className="metric-name">{isEn ? "Aeolian Desiccation" : "Desecación Eólica y Vientos"}</span>
+                  <strong className="metric-value">{climateData.earth.windDesiccation}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Operational Takeaway */}
+          <div className="climate-divergence-box" style={{ marginTop: "0.5rem" }}>
+            <div className="divergence-tag">
+              <span>⚡ {isEn ? "OPERATIONAL ATMOSPHERIC RATIONALE" : "JUSTIFICACIÓN OPERACIONAL ATMOSFÉRICA"}</span>
+            </div>
+            <div className="divergence-text">
+              <p><strong>{isEn ? "Scientific Divergence: " : "Divergencia Científica: "}</strong>{climateData.scientificDivergence.thermalDivergence}</p>
+              <p><strong>{isEn ? "Mission Testing Value: " : "Valor de Ensayo en Misión: "}</strong>{climateData.space.operationalAtmosphericNote}</p>
             </div>
           </div>
         </div>

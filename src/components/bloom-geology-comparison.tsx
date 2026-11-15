@@ -2,6 +2,7 @@
 
 import { getSpaceProfile, type GeologyComparisonItem } from "@/lib/analog-science-dossier";
 import { analogTranslationsEn, type SupportedLang } from "@/lib/translations";
+import { getClimateComparison } from "@/lib/climate-science-engine";
 
 interface BloomGeologyComparisonProps {
   analogs: GeologyComparisonItem[];
@@ -34,22 +35,22 @@ export function BloomGeologyComparison({
       <div className="bloom-section-header">
         <span className="bloom-section-badge">
           {isEn
-            ? "COMPARATIVE SCIENTIFIC EVALUATION · NASA AUDITED DATASETS"
-            : "EVALUACIÓN CIENTÍFICA COMPARATIVA · NASA AUDITED DATASETS"}
+            ? "INTEGRAL MULTIDOMAIN EVALUATION · GEOLOGY, CLIMATE & ATMOSPHERE"
+            : "EVALUACIÓN CIENTÍFICA INTEGRAL · GEOLOGÍA, CLIMA EXTREMO Y ENTORNO ATMOSFÉRICO"}
         </span>
         <h2 className="bloom-section-title">
           {isMoon
             ? isEn
-              ? "Geological Modeling & Analogs for the Moon (Artemis)"
-              : "Modelado Geológico y Análogos para la Luna (Artemis)"
+              ? "Multidomain Modeling: Geology, Climate & Atmosphere for the Moon (Artemis)"
+              : "Modelado Multidominio: Geología, Clima Extremo y Entorno Atmosférico para la Luna (Artemis)"
             : isEn
-            ? "Geological Modeling & Analogs for Planet Mars"
-            : "Modelado Geológico y Análogos para el Planeta Marte"}
+            ? "Multidomain Modeling: Geology, Climate & Atmosphere for Planet Mars"
+            : "Modelado Multidominio: Geología, Clima Extremo y Entorno Atmosférico para el Planeta Marte"}
         </h2>
         <p className="bloom-section-desc">
           {isEn
-            ? "Side-by-side instrumental and geological contrast between Earth regions and candidate space targets. Each analog details where physical analogy holds solid, where it fails, and its direct operational mission value."
-            : "Contraste instrumental y geológico lado a lado entre regiones terrestres y objetivos espaciales candidatos. Cada análogo detalla dónde la analogía física es sólida, dónde falla y su valor operacional directo para la misión."}
+            ? "Side-by-side instrumental, geological, and atmospheric contrast between Earth regions and candidate space targets. Simultaneously models surface geomorphology, day/night thermal extremes, barometric pressure, solar UV irradiance, and volatile stability."
+            : "Contraste instrumental, geológico y meteorológico lado a lado entre regiones terrestres y objetivos espaciales candidatos. Modela simultáneamente geomorfología de superficie, extremos térmicos día/noche, presión barométrica, radiación solar UV y estabilidad de volátiles."}
         </p>
       </div>
 
@@ -175,6 +176,7 @@ export function BloomGeologyComparison({
         const analogyLimits = trans?.analogyLimitations ?? item.analogyLimitations;
         const operationalVal = trans?.operationalValue ?? item.operationalValue;
         const metrics = trans?.metrics ?? item.metrics;
+        const climateData = getClimateComparison(item.id, body);
 
         return (
           <article key={item.id} className="bloom-analog-card liquid-glass-strong">
@@ -282,6 +284,114 @@ export function BloomGeologyComparison({
                     {isEn ? "Space Minerals: " : "Minerales Espaciales: "}
                   </strong>
                   {spaceMineralogy}
+                </div>
+              </div>
+            </div>
+
+            {/* 02. MODULO DE EVALUACIÓN CLIMÁTICA, TÉRMICA Y AMBIENTE EXTREMO */}
+            <div className="bloom-climate-panel liquid-glass">
+              <div className="bloom-climate-header">
+                <div className="bloom-climate-badge">
+                  <span>🌡️ {isEn ? "ATMOSPHERIC & CLIMATE ANALYSIS MATRIX" : "MATRIZ DE ANÁLISIS CLIMÁTICO Y ATMOSFÉRICO"}</span>
+                  <span className="fidelity-dot" />
+                  <span>{climateData.space.climateFidelityRating} {isEn ? "FIDELITY" : "COMPATIBILIDAD"}</span>
+                </div>
+                <h4 className="bloom-climate-title">
+                  {isEn
+                    ? "Extreme Climate Regimes & Planetary Atmosphere Contrast"
+                    : "Régimen Climático Extremo y Contraste Atmosférico Planetario"}
+                </h4>
+              </div>
+
+              <div className="bloom-climate-quad-grid">
+                {/* 1. Thermal Extremes */}
+                <div className="climate-quad-box">
+                  <div className="quad-label">
+                    <span>🌡️</span>
+                    <strong>{isEn ? "Thermal Regimes & Diurnal Swing" : "Régimen Térmico y Amplitud Día/Noche"}</strong>
+                  </div>
+                  <div className="quad-body">
+                    <div className="quad-subrow earth">
+                      <span className="quad-target">🌍 {item.name}:</span>
+                      <strong>{climateData.earth.tempRange}</strong>
+                      <small>{climateData.earth.tempDayNight}</small>
+                    </div>
+                    <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
+                      <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"} ({climateData.space.targetName}):</span>
+                      <strong>{climateData.space.tempRange}</strong>
+                      <small>{climateData.space.tempDescription}</small>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Atmospheric Pressure */}
+                <div className="climate-quad-box">
+                  <div className="quad-label">
+                    <span>💨</span>
+                    <strong>{isEn ? "Barometric Pressure & Gas Density" : "Presión Barométrica y Densidad de Gas"}</strong>
+                  </div>
+                  <div className="quad-body">
+                    <div className="quad-subrow earth">
+                      <span className="quad-target">🌍 {item.name}:</span>
+                      <strong>{climateData.earth.atmosphericPressure}</strong>
+                      <small>{climateData.earth.atmosphericDensity}</small>
+                    </div>
+                    <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
+                      <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"}:</span>
+                      <strong>{climateData.space.atmosphericPressure}</strong>
+                      <small>{climateData.space.pressureDescription}</small>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Solar UV & Radiation */}
+                <div className="climate-quad-box">
+                  <div className="quad-label">
+                    <span>☀️</span>
+                    <strong>{isEn ? "Solar UV Irradiance & Radiation" : "Radiación Solar Ultravioleta & Cósmica"}</strong>
+                  </div>
+                  <div className="quad-body">
+                    <div className="quad-subrow earth">
+                      <span className="quad-target">🌍 {item.name}:</span>
+                      <strong>{climateData.earth.uvIndex}</strong>
+                      <small>{climateData.earth.solarInsolation}</small>
+                    </div>
+                    <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
+                      <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"}:</span>
+                      <strong>{climateData.space.solarRadiationUv}</strong>
+                      <small>{climateData.space.radiationDescription}</small>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Aridity & Eolian Dynamics */}
+                <div className="climate-quad-box">
+                  <div className="quad-label">
+                    <span>🌪️</span>
+                    <strong>{isEn ? "Relative Humidity & Aeolian Dynamics" : "Humedad Relativa y Dinámica Eólica"}</strong>
+                  </div>
+                  <div className="quad-body">
+                    <div className="quad-subrow earth">
+                      <span className="quad-target">🌍 {item.name}:</span>
+                      <strong>{climateData.earth.windDesiccation}</strong>
+                    </div>
+                    <div className={`quad-subrow space ${!isMoon ? "mars" : ""}`}>
+                      <span className="quad-target">{isMoon ? "🌕 Luna" : "🪐 Marte"}:</span>
+                      <strong>{climateData.space.relativeHumidity}</strong>
+                      <small>{climateData.space.windEolianDynamics}</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scientific Divergence & Mitigation */}
+              <div className="climate-divergence-box">
+                <div className="divergence-tag">
+                  <span>⚠️ {isEn ? "CRITICAL PHYSICAL LIMIT & MITIGATION PROTOCOL" : "LÍMITE FÍSICO CRÍTICO Y PROTOCOLO DE MITIGACIÓN"}</span>
+                </div>
+                <div className="divergence-text">
+                  <p><strong>{isEn ? "Thermal & Atmospheric Delta: " : "Delta Térmico y Atmosférico: "}</strong>{climateData.scientificDivergence.thermalDivergence}</p>
+                  <p><strong>{isEn ? "Operational Protocol: " : "Protocolo Operativo: "}</strong>{climateData.space.operationalAtmosphericNote}</p>
                 </div>
               </div>
             </div>
