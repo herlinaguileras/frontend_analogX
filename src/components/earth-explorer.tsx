@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import {
   allDetailedRegionsList,
@@ -41,6 +41,20 @@ export function EarthExplorer() {
   const [probeLoading, setProbeLoading] = useState<boolean>(false);
   const [activeProbeCoords, setActiveProbeCoords] = useState<{ lat: number; lng: number } | null>(null);
   const viewportRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    document.body.classList.toggle("printing-earth-report", reportModalOpen);
+    if (!reportModalOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setReportModalOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.classList.remove("printing-earth-report");
+    };
+  }, [reportModalOpen]);
 
   const handleProbeCoordinate = async (coords: { lat: number; lng: number }) => {
     setActiveProbeCoords(coords);
@@ -512,129 +526,233 @@ export function EarthExplorer() {
           ========================================================================= */}
       {reportModalOpen && (
         <div className="report-modal-backdrop" onClick={() => setReportModalOpen(false)}>
-          <div
+          <article
             className="report-modal-content"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
+            aria-labelledby="earth-report-title"
           >
-            <div className="modal-header-bar">
+            <header className="modal-header-bar">
               <div className="modal-title-wrap">
-                <span className="modal-eyebrow">
-                  {isEn
-                    ? "EARTH ANALOG TECHNICAL REPORT · NASA CHALLENGE 2026"
-                    : "INFORME TÉCNICO DE ANÁLOGO TERRESTRE · RETO NASA 2026"}
-                </span>
-                <h2>{activeRegion.name} ({activeRegion.country})</h2>
+                <div className="report-header-badges">
+                  <span className="modal-eyebrow">
+                    {isEn
+                      ? "ANALOGX TECHNICAL DOSSIER · NASA CHALLENGE 2026"
+                      : "DOSSIER TÉCNICO ANALOGX · RETO NASA 2026"}
+                  </span>
+                  <span className="report-doc-code">ID: {activeRegion.id.toUpperCase()}</span>
+                </div>
+                <h2 id="earth-report-title">
+                  {activeRegion.name} <span className="report-country-sub">({activeRegion.country} · {activeRegion.countryCode})</span>
+                </h2>
+                <p className="report-lead-summary">{activeRegion.nasaRoleSummary}</p>
               </div>
-              <button
-                type="button"
-                className="modal-close-btn"
-                onClick={() => setReportModalOpen(false)}
-                aria-label={isEn ? "Close report" : "Cerrar informe"}
-              >
-                ✕
-              </button>
-            </div>
+              <div className="report-header-actions print-hide">
+                <button
+                  type="button"
+                  className="modal-print-btn modal-print-btn-primary"
+                  onClick={() => window.print()}
+                >
+                  {isEn ? "Print / Save PDF" : "Imprimir / Guardar PDF"}
+                </button>
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setReportModalOpen(false)}
+                  aria-label={isEn ? "Close report" : "Cerrar informe"}
+                >
+                  ✕
+                </button>
+              </div>
+            </header>
 
             <div className="modal-scroll-body">
               <div className="report-meta-grid">
                 <div className="report-meta-col">
-                  <span>{isEn ? "ELEVATION:" : "ELEVACIÓN:"}</span> <strong>{activeRegion.elevation}</strong>
+                  <span className="meta-label">{isEn ? "ELEVATION" : "ELEVACIÓN"}</span>
+                  <strong className="meta-val">{activeRegion.elevation}</strong>
                 </div>
                 <div className="report-meta-col">
-                  <span>{isEn ? "COORDINATES:" : "COORDENADAS:"}</span> <strong>{activeRegion.coordinatesFormatted} (WGS84)</strong>
+                  <span className="meta-label">{isEn ? "COORDINATES (WGS84)" : "COORDENADAS (WGS84)"}</span>
+                  <strong className="meta-val">{activeRegion.coordinatesFormatted}</strong>
                 </div>
                 <div className="report-meta-col">
-                  <span>{isEn ? "ATMOSPHERIC PRESSURE:" : "PRESIÓN ATMOSFÉRICA:"}</span> <strong>{activeRegion.atmosphericPressure}</strong>
+                  <span className="meta-label">{isEn ? "THERMAL RANGE" : "RANGO TÉRMICO"}</span>
+                  <strong className="meta-val">{activeRegion.tempRange}</strong>
                 </div>
                 <div className="report-meta-col">
-                  <span>{isEn ? "SATELLITE DATASETS:" : "DATASETS SATELITALES:"}</span> <strong>{activeRegion.verifiedDataset}</strong>
+                  <span className="meta-label">{isEn ? "ATMOSPHERIC PRESSURE" : "PRESIÓN ATMOSFÉRICA"}</span>
+                  <strong className="meta-val">{activeRegion.atmosphericPressure}</strong>
                 </div>
               </div>
 
-              <div className="report-text-block">
-                <h3>{isEn ? "1. Topology, Surface Morphology and Terradynamics" : "1. Topología, Morfología de Superficie y Terradinámica"}</h3>
-                <p>
-                  {isEn
-                    ? <>The site exhibits a surface classified as <em>{activeRegion.topologyGeomorphology.surfaceType}</em>. The estimated mean slope is <strong>{activeRegion.topologyGeomorphology.slope}</strong>, with micro-roughness of {activeRegion.topologyGeomorphology.roughness}. Substrate bearing capacity is <strong>{activeRegion.topologyGeomorphology.bearingCapacity}</strong>.</>
-                    : <>El sitio presenta una superficie clasificada como <em>{activeRegion.topologyGeomorphology.surfaceType}</em>. La pendiente media estimada es de <strong>{activeRegion.topologyGeomorphology.slope}</strong>, con una micro-rugosidad de {activeRegion.topologyGeomorphology.roughness}. La capacidad portante del sustrato es de <strong>{activeRegion.topologyGeomorphology.bearingCapacity}</strong>.</>}
-                </p>
-                <div className="report-note-box">
-                  <strong>{isEn ? "Rover and Lander Risk Assessment:" : "Evaluación de Riesgo para Rovers y Aterrizadores:"}</strong> {activeRegion.topologyGeomorphology.roverRisk}
+              <div className="report-provenance-strip">
+                <div className="provenance-cell">
+                  <span className="meta-label">{isEn ? "PRIMARY MINERALOGY" : "MINERALOGÍA DOMINANTE"}</span>
+                  <span className="provenance-val">{activeRegion.primaryMinerals}</span>
+                </div>
+                <div className="provenance-cell">
+                  <span className="meta-label">{isEn ? "VERIFIED SATELLITE DATASETS" : "DATASETS SATELITALES AUDITADOS"}</span>
+                  <span className="provenance-val">{activeRegion.verifiedDataset}</span>
                 </div>
               </div>
 
-              <div className="report-text-block">
-                <h3>{isEn ? "2. Climatic, Thermal and Radiative Regime" : "2. Régimen Climático, Térmico y Radiativo"}</h3>
-                <p>
-                  {isEn
-                    ? <>The measured thermal gradient is <strong>{activeRegion.tempRange}</strong> ({activeRegion.climateEnvironment.tempDayNight}). Surface solar insolation exceeds <strong>{activeRegion.climateEnvironment.solarInsolation}</strong>, with a UV radiation index of <strong>{activeRegion.uvIndex}</strong>. Local atmospheric density is <strong>{activeRegion.climateEnvironment.atmosphericDensity}</strong>, subject to {activeRegion.climateEnvironment.windDesiccation}.</>
-                    : <>El gradiente de temperatura medido es de <strong>{activeRegion.tempRange}</strong> ({activeRegion.climateEnvironment.tempDayNight}). La insolación solar superficial supera los <strong>{activeRegion.climateEnvironment.solarInsolation}</strong>, con un índice de radiación ultravioleta de <strong>{activeRegion.uvIndex}</strong>. La densidad atmosférica local es de <strong>{activeRegion.climateEnvironment.atmosphericDensity}</strong>, sometida a {activeRegion.climateEnvironment.windDesiccation}.</>}
-                </p>
+              <div className="report-sections-grid">
+                <section className="report-section-card">
+                  <div className="report-card-head">
+                    <span className="section-num">01</span>
+                    <h3>{isEn ? "Topology & Terradynamics" : "Topología y Terradinámica"}</h3>
+                  </div>
+                  <dl className="report-spec-list">
+                    <div className="spec-row">
+                      <dt>{isEn ? "Surface Morphology" : "Morfología de superficie"}</dt>
+                      <dd>{activeRegion.topologyGeomorphology.surfaceType}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Slope & Roughness" : "Pendiente y rugosidad"}</dt>
+                      <dd>{activeRegion.topologyGeomorphology.slope} · {activeRegion.topologyGeomorphology.roughness}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Bearing Capacity" : "Capacidad portante"}</dt>
+                      <dd>{activeRegion.topologyGeomorphology.bearingCapacity}</dd>
+                    </div>
+                  </dl>
+                  <div className="report-note-box">
+                    <strong>{isEn ? "Rover & Lander Risk:" : "Riesgo para Rovers y Aterrizaje:"}</strong> {activeRegion.topologyGeomorphology.roverRisk}
+                  </div>
+                </section>
+
+                <section className="report-section-card">
+                  <div className="report-card-head">
+                    <span className="section-num">02</span>
+                    <h3>{isEn ? "Climate, Radiation & Atmosphere" : "Clima, Radiación y Atmósfera"}</h3>
+                  </div>
+                  <dl className="report-spec-list">
+                    <div className="spec-row">
+                      <dt>{isEn ? "Diurnal Thermal Cycle" : "Oscilación térmica día/noche"}</dt>
+                      <dd>{activeRegion.climateEnvironment.tempDayNight}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Solar Insolation & UV" : "Insolación solar y UV"}</dt>
+                      <dd>{activeRegion.climateEnvironment.solarInsolation} · {activeRegion.uvIndex}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Atmospheric Density" : "Densidad atmosférica"}</dt>
+                      <dd>{activeRegion.climateEnvironment.atmosphericDensity}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Aeolian Dynamics" : "Dinámica eólica y desecación"}</dt>
+                      <dd>{activeRegion.climateEnvironment.windDesiccation}</dd>
+                    </div>
+                  </dl>
+                </section>
+
+                <section className="report-section-card">
+                  <div className="report-card-head">
+                    <span className="section-num">03</span>
+                    <h3>{isEn ? "In-Situ Resource Utilization (ISRU)" : "Recursos In-Situ Disponibles (ISRU)"}</h3>
+                    <span className="report-rating-pill">{activeRegion.availableResourcesIsru.resourceRating}</span>
+                  </div>
+                  <dl className="report-spec-list">
+                    <div className="spec-row">
+                      <dt>{isEn ? "Water & Volatiles" : "Extracción hídrica"}</dt>
+                      <dd>{activeRegion.availableResourcesIsru.waterExtraction}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Construction & Sintering" : "Construcción y sinterizado"}</dt>
+                      <dd>{activeRegion.availableResourcesIsru.mineralsForConstruction}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Thermal Storage" : "Almacenamiento térmico"}</dt>
+                      <dd>{activeRegion.availableResourcesIsru.thermalStorage}</dd>
+                    </div>
+                  </dl>
+                </section>
+
+                <section className="report-section-card">
+                  <div className="report-card-head">
+                    <span className="section-num">04</span>
+                    <h3>{isEn ? "Landing, Base & EVA Suitability" : "Aptitud de Aterrizaje, Bases y EVA"}</h3>
+                  </div>
+                  <dl className="report-spec-list">
+                    <div className="spec-row">
+                      <dt>{isEn ? "Landing Site Rationale" : "Sitio de aterrizaje"}</dt>
+                      <dd>{activeRegion.futureLandingBaseSuitability.landingSiteRationale}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Habitats & Construction" : "Construcción y hábitats"}</dt>
+                      <dd>{activeRegion.futureLandingBaseSuitability.baseConstructionRationale}</dd>
+                    </div>
+                    <div className="spec-row">
+                      <dt>{isEn ? "Human EVA Rehearsals" : "Operaciones humanas (EVA)"}</dt>
+                      <dd>{activeRegion.futureLandingBaseSuitability.evaTestingRationale}</dd>
+                    </div>
+                  </dl>
+                  <div className="report-note-box report-note-solid">
+                    <strong>{isEn ? "Verifiable Extraterrestrial Twin:" : "Analogía Extraterrestre Sólida:"}</strong> {activeRegion.solidAnalogy}
+                  </div>
+                </section>
               </div>
 
-              <div className="report-text-block">
-                <h3>{isEn ? "3. In-Situ Resource Characterization (ISRU)" : "3. Caracterización de Recursos in-situ (ISRU)"}</h3>
-                <p>
-                  <strong>{isEn ? "Water Extraction:" : "Extracción Hídrica:"}</strong> {activeRegion.availableResourcesIsru.waterExtraction}
-                </p>
-                <p>
-                  <strong>{isEn ? "Construction & Sintering Materials:" : "Materiales para Construcción y Sinterizado:"}</strong> {activeRegion.availableResourcesIsru.mineralsForConstruction}
-                </p>
-                <p>
-                  <strong>{isEn ? "Thermal Storage & Energy Balance:" : "Almacenamiento Térmico y Balanza de Energía:"}</strong> {activeRegion.availableResourcesIsru.thermalStorage}
-                </p>
-              </div>
-
-              <div className="report-text-block">
-                <h3>{isEn ? "4. Selection Criteria for Landing Sites & Permanent Bases" : "4. Criterios de Selección para Lugares de Aterrizaje y Bases Permanentes"}</h3>
-                <p>
-                  <strong>{isEn ? "Landing Site Rationale:" : "Justificación para Selección de Sitio de Aterrizaje:"}</strong> {activeRegion.futureLandingBaseSuitability.landingSiteRationale}
-                </p>
-                <p>
-                  <strong>{isEn ? "Base Construction & Habitats:" : "Justificación para Construcción y Hábitats:"}</strong> {activeRegion.futureLandingBaseSuitability.baseConstructionRationale}
-                </p>
-                <p>
-                  <strong>{isEn ? "Human EVA Operational Rehearsals:" : "Ensayos de Operaciones Humanas (EVA):"}</strong> {activeRegion.futureLandingBaseSuitability.evaTestingRationale}
-                </p>
-              </div>
-
-              <div className="report-text-block">
-                <h3>{isEn ? "5. Epistemic Rigor Clause: Where the Earth Analogy Fails" : "5. Cláusula de Rigor Epistemológico: Dónde Falla la Analogía Terrestre"}</h3>
-                <ul className="report-limits-list">
-                  <li>
-                    <strong>{isEn ? "Gravitational Limit:" : "Límite Gravitacional:"}</strong> {activeRegion.whereAnalogyFails.gravityLimit}
-                  </li>
-                  <li>
-                    <strong>{isEn ? "Atmospheric Pressure Limit:" : "Límite de Presión y Atmósfera:"}</strong> {activeRegion.whereAnalogyFails.atmospherePressureLimit}
-                  </li>
-                  <li>
-                    <strong>{isEn ? "Cosmic Radiation Limit:" : "Límite de Radiación Cósmica:"}</strong> {activeRegion.whereAnalogyFails.radiationLimit}
-                  </li>
-                  <li>
-                    <strong>{isEn ? "Biological Background Limit:" : "Límite Biológico:"}</strong> {activeRegion.whereAnalogyFails.biologicalLimit}
-                  </li>
-                  <li>
-                    <strong>{isEn ? "Instrument Mitigation Protocol:" : "Protocolo de Mitigación Instrumental:"}</strong> {activeRegion.whereAnalogyFails.mitigationProtocol}
-                  </li>
-                </ul>
-              </div>
+              <section className="report-section-card report-section-full">
+                <div className="report-card-head">
+                  <span className="section-num">05</span>
+                  <h3>
+                    {isEn
+                      ? "Epistemic Rigor Clause: Where the Earth Analogy Fails"
+                      : "Cláusula de Rigor Epistemológico: Límites Físicos de la Analogía"}
+                  </h3>
+                </div>
+                <div className="report-limits-grid">
+                  <div className="limit-card">
+                    <strong>{isEn ? "Gravitational Limit" : "Límite Gravitacional"}</strong>
+                    <p>{activeRegion.whereAnalogyFails.gravityLimit}</p>
+                  </div>
+                  <div className="limit-card">
+                    <strong>{isEn ? "Atmospheric Pressure Limit" : "Límite de Presión y Atmósfera"}</strong>
+                    <p>{activeRegion.whereAnalogyFails.atmospherePressureLimit}</p>
+                  </div>
+                  <div className="limit-card">
+                    <strong>{isEn ? "Cosmic Radiation Limit" : "Límite de Radiación Cósmica"}</strong>
+                    <p>{activeRegion.whereAnalogyFails.radiationLimit}</p>
+                  </div>
+                  <div className="limit-card">
+                    <strong>{isEn ? "Biological Background Limit" : "Límite Biológico Terrestre"}</strong>
+                    <p>{activeRegion.whereAnalogyFails.biologicalLimit}</p>
+                  </div>
+                </div>
+                <div className="report-mitigation-banner">
+                  <strong>{isEn ? "Instrument Mitigation Protocol:" : "Protocolo de Mitigación Instrumental:"}</strong>{" "}
+                  <span>{activeRegion.whereAnalogyFails.mitigationProtocol}</span>
+                </div>
+              </section>
             </div>
 
-            <div className="modal-footer-bar">
+            <footer className="modal-footer-bar">
               <span className="modal-footer-brand">
-                {isEn ? "ANALOGX ENGINE · AUDITED SCIENTIFIC VERIFICATION" : "ANALOGX ENGINE · VERIFICACIÓN CIENTÍFICA AUDITADA"}
+                {isEn
+                  ? "ANALOGX ENGINE · AUDITED SCIENTIFIC VERIFICATION · NASA SPACE APPS 2026"
+                  : "ANALOGX ENGINE · VERIFICACIÓN CIENTÍFICA AUDITADA · NASA SPACE APPS 2026"}
               </span>
-              <button
-                type="button"
-                className="modal-print-btn"
-                onClick={() => window.print()}
-              >
-                {isEn ? "Print / Save PDF" : "Imprimir / Guardar PDF"}
-              </button>
-            </div>
-          </div>
+              <div className="report-footer-actions print-hide">
+                <button
+                  type="button"
+                  className="modal-close-btn"
+                  onClick={() => setReportModalOpen(false)}
+                >
+                  {isEn ? "Close" : "Cerrar"}
+                </button>
+                <button
+                  type="button"
+                  className="modal-print-btn"
+                  onClick={() => window.print()}
+                >
+                  {isEn ? "Print / Save PDF" : "Imprimir / Guardar PDF"}
+                </button>
+              </div>
+            </footer>
+          </article>
         </div>
       )}
     </main>
