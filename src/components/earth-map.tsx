@@ -125,15 +125,24 @@ export default function EarthMap({
     map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit: "metric" }), "bottom-left");
 
+    const loadTimeout = window.setTimeout(() => setLoading(false), 6000);
+
     map.on("style.load", () => {
-      setReady(true);
       map.setProjection({ type: "globe" });
+      setReady(true);
     });
     map.on("load", () => {
+      window.clearTimeout(loadTimeout);
       setLoading(false);
-      map.setProjection({ type: "globe" });
     });
-    map.on("idle", () => setLoading(false));
+    map.on("idle", () => {
+      window.clearTimeout(loadTimeout);
+      setLoading(false);
+    });
+    map.on("error", () => {
+      window.clearTimeout(loadTimeout);
+      setLoading(false);
+    });
     map.on("zoomend", () => setZoom(map.getZoom()));
 
     map.on("mousemove", (e) => {
@@ -144,6 +153,7 @@ export default function EarthMap({
     resize.observe(containerRef.current);
 
     return () => {
+      window.clearTimeout(loadTimeout);
       resize.disconnect();
       markersRef.current.forEach(m => m.remove());
       markersRef.current = [];
@@ -204,7 +214,11 @@ export default function EarthMap({
         onSelectRef.current(region.id);
       });
 
-      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
+      const marker = new maplibregl.Marker({
+        element: el,
+        anchor: "center",
+        opacityWhenCovered: "0",
+      })
         .setLngLat(position)
         .addTo(map);
 

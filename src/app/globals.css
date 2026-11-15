@@ -3887,13 +3887,25 @@ tbody tr:hover {
   z-index: 20;
 }
 
-/* Marcadores sobre el mapa */
-.earth-marker-wrapper {
-  position: relative;
+/* Marcadores sobre el mapa 3D */
+.maplibregl-marker.earth-marker-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
   cursor: pointer;
-  transform: translate(-50%, -50%);
+}
+
+.maplibregl-marker.earth-marker-wrapper.maplibregl-marker-covered {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden;
 }
 
 .earth-marker-pulse {
@@ -3915,10 +3927,12 @@ tbody tr:hover {
 }
 
 .earth-marker-dot {
-  width: 9px;
-  height: 9px;
+  position: relative;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   border: 1.5px solid #ffffff;
+  box-sizing: border-box;
   z-index: 2;
   transition: transform 0.2s ease;
 }
@@ -5415,19 +5429,141 @@ tbody tr:hover {
   font-family: var(--font-mono, monospace);
 }
 
-.bloom-tag-compat.ALTA {
+.bloom-tag-compat.ALTA,
+.bloom-tag-compat.HIGH {
   background: rgba(127, 213, 121, 0.15);
   color: #7fd579;
 }
 
-.bloom-tag-compat.MEDIA {
+.bloom-tag-compat.MEDIA,
+.bloom-tag-compat.MEDIUM {
   background: rgba(251, 191, 36, 0.15);
   color: #fbbf24;
 }
 
-.bloom-tag-compat.PARCIAL {
+.bloom-tag-compat.PARCIAL,
+.bloom-tag-compat.PARTIAL,
+.bloom-tag-compat.LÍMITE {
   background: rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.7);
+}
+
+/* Filter-gated Awaiting Card */
+.bloom-awaiting-filter-card {
+  max-width: 820px;
+  margin: 0 auto 2.5rem;
+  padding: 2.75rem 2.25rem;
+  border-radius: 1.5rem;
+  text-align: center;
+  border: 1px solid rgba(139, 139, 254, 0.28);
+  background: rgba(16, 18, 28, 0.72);
+}
+
+.bloom-awaiting-filter-card h3 {
+  font-family: var(--font-heading, var(--font-sans));
+  font-size: clamp(1.375rem, 2.5vw, 1.75rem);
+  font-weight: 500;
+  color: #fff;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.bloom-awaiting-filter-card p {
+  max-width: 640px;
+  margin: 0 auto 1.5rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+/* Single-Analog Filtered Selector Bar */
+.bloom-analog-selector-bar {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1.125rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.bloom-analog-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.bloom-analog-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bloom-pager-btn {
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bloom-pager-btn:hover {
+  background: rgba(65, 65, 252, 0.22);
+  border-color: rgba(139, 139, 254, 0.45);
+  color: #fff;
+}
+
+.bloom-analog-selector-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+}
+
+.bloom-analog-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bloom-analog-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+
+.bloom-analog-tab.active {
+  background: rgba(65, 65, 252, 0.28);
+  border-color: rgba(139, 139, 254, 0.7);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(65, 65, 252, 0.25);
+}
+
+.bloom-analog-tab-score {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: #7fd579;
+  font-weight: 700;
+}
+
+.bloom-report-row-active {
+  background: rgba(65, 65, 252, 0.16) !important;
+  box-shadow: inset 3px 0 0 #8b8bfe;
 }
 
 /* Citations and Datasets */
@@ -5531,6 +5667,12 @@ tbody tr:hover {
   }
   .bloom-analog-card {
     padding: 1.25rem;
+  }
+  .bloom-awaiting-filter-card {
+    padding: 2rem 1.25rem;
+  }
+  .bloom-analog-selector-bar {
+    padding: 1rem 1.125rem;
   }
   .bloom-official-report {
     padding: 1.5rem;

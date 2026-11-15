@@ -11,6 +11,7 @@ interface BloomHeroFilterProps {
   onConditionFilterChange: (val: string) => void;
   environmentFilter: string;
   onEnvironmentFilterChange: (val: string) => void;
+  onQuickFilter: (role: string) => void;
   matchCount: number;
   avgScore: number;
   onApplyFilters: () => void;
@@ -26,6 +27,7 @@ export function BloomHeroFilter({
   onConditionFilterChange,
   environmentFilter,
   onEnvironmentFilterChange,
+  onQuickFilter,
   matchCount,
   avgScore,
   onApplyFilters,
@@ -35,9 +37,8 @@ export function BloomHeroFilter({
   const isMoon = body === "Moon";
   const isEn = lang === "en";
 
-  const handleQuickTag = (role: string, condition?: string) => {
-    onRoleFilterChange(role);
-    if (condition) onConditionFilterChange(condition);
+  const handleQuickTag = (role: string) => {
+    onQuickFilter(role);
   };
 
   return (
@@ -330,28 +331,28 @@ export function BloomHeroFilter({
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "base" ? "active" : ""}`}
-              onClick={() => handleQuickTag("base", "regolith")}
+              onClick={() => handleQuickTag("base")}
             >
               {isEn ? "Permanent Base" : "Base Permanente"}
             </button>
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "isru" ? "active" : ""}`}
-              onClick={() => handleQuickTag("isru", "cryogenic")}
+              onClick={() => handleQuickTag("isru")}
             >
               {isEn ? "ISRU Mining" : "Extracción ISRU"}
             </button>
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "caves" ? "active" : ""}`}
-              onClick={() => handleQuickTag("caves", "radiation")}
+              onClick={() => handleQuickTag("caves")}
             >
               {isEn ? "Lava Tubes" : "Tubos de Lava"}
             </button>
             <button
               type="button"
               className={`bloom-quick-pill ${roleFilter === "mobility" ? "active" : ""}`}
-              onClick={() => handleQuickTag("mobility", "regolith")}
+              onClick={() => handleQuickTag("mobility")}
             >
               {isEn ? "Rover Wheels" : "Ruedas de Rover"}
             </button>

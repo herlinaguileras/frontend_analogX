@@ -1,15 +1,35 @@
 "use client";
 
-import type { GeologyComparisonItem } from "@/lib/analog-science-dossier";
+import {
+  getSpaceProfile,
+  type GeologyComparisonItem,
+} from "@/lib/analog-science-dossier";
 import type { SupportedLang } from "@/lib/translations";
 
 interface BloomOfficialReportProps {
   analogs: GeologyComparisonItem[];
+  activeAnalogId?: string | null;
+  onSelectAnalog?: (id: string) => void;
   body: "Moon" | "Mars";
   lang: SupportedLang;
 }
 
-export function BloomOfficialReport({ analogs, body, lang }: BloomOfficialReportProps) {
+const REPORT_ROLE_LABELS: Record<string, { es: string; en: string }> = {
+  landing: { es: "Aterrizaje", en: "Landing" },
+  base: { es: "Hábitat Base", en: "Base Habitat" },
+  isru: { es: "Minería ISRU", en: "ISRU Mining" },
+  caves: { es: "Tubos de Lava", en: "Lava Tubes" },
+  mobility: { es: "Movilidad Rover", en: "Rover Mobility" },
+  astrobiology: { es: "Astrobiología", en: "Astrobiology" },
+};
+
+export function BloomOfficialReport({
+  analogs,
+  activeAnalogId,
+  onSelectAnalog,
+  body,
+  lang,
+}: BloomOfficialReportProps) {
   const isMoon = body === "Moon";
   const isEn = lang === "en";
 
@@ -50,12 +70,14 @@ export function BloomOfficialReport({ analogs, body, lang }: BloomOfficialReport
             }}
           >
             {isEn
-              ? `Decision matrix for space technology test site selection and astronaut training (${
-                  isMoon ? "Artemis Lunar Mission" : "Mars 2026 Mission"
-                }).`
-              : `Matriz de decisión para selección de sitios de prueba de tecnología espacial y entrenamiento de astronautas (Misión ${
-                  isMoon ? "Artemis Lunar" : "Marte 2026"
-                }).`}
+              ? `Decision matrix for your ${analogs.length} filtered match${
+                  analogs.length === 1 ? "" : "es"
+                } (${isMoon ? "Artemis Lunar Mission" : "Mars 2026 Mission"}). Select a row to open its surface comparison.`
+              : `Matriz de decisión de tus ${analogs.length} coincidencia${
+                  analogs.length === 1 ? "" : "s"
+                } filtrada${
+                  analogs.length === 1 ? "" : "s"
+                } (Misión ${isMoon ? "Artemis Lunar" : "Marte 2026"}). Haz clic en una fila para ver su comparativa.`}
           </p>
         </div>
 
@@ -78,38 +100,62 @@ export function BloomOfficialReport({ analogs, body, lang }: BloomOfficialReport
             </tr>
           </thead>
           <tbody>
-            {analogs.map((item) => (
-              <tr key={item.id}>
-                <td>
-                  <strong>{item.name}</strong>
-                </td>
-                <td>{item.country}</td>
-                <td>{item.elevation}</td>
-                <td>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono, monospace)",
-                      color: item.fidelityScore >= 90 ? "#7fd579" : "#8b8bfe",
-                      fontWeight: 700,
-                    }}
-                  >
-                    {item.fidelityScore}%
-                  </span>
-                </td>
-                <td>{item.spaceTargetName.split("/")[0]}</td>
-                <td>
-                  <span className="bloom-tag-compat ALTA">
-                    {item.operationalRoles.includes("landing") && (isEn ? "Landing" : "Aterrizaje")}
-                    {item.operationalRoles.includes("base") &&
-                      (isEn ? " · Base Habitat" : " · Hábitat Base")}
-                    {item.operationalRoles.includes("isru") &&
-                      (isEn ? " · ISRU Mining" : " · Minería ISRU")}
-                    {item.operationalRoles.includes("caves") &&
-                      (isEn ? " · Lava Tubes" : " · Tubos de Lava")}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {analogs.map((item) => {
+              const isSelected = activeAnalogId === item.id;
+              const spaceProfile = getSpaceProfile(item, body);
+              const targetName = spaceProfile?.targetName ?? item.spaceTargetName.split("/")[0];
+              const rolesText = item.operationalRoles
+                .map((role) => REPORT_ROLE_LABELS[role]?.[lang])
+                .filter(Boolean)
+                .join(" · ");
+
+              return (
+                <tr
+                  key={item.id}
+                  className={isSelected ? "bloom-report-row-active" : undefined}
+                  onClick={onSelectAnalog ? () => onSelectAnalog(item.id) : undefined}
+                  style={onSelectAnalog ? { cursor: "pointer" } : undefined}
+                >
+                  <td>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                      <strong>{item.name}</strong>
+                      {isSelected && (
+                        <span
+                          style={{
+                            fontSize: "0.625rem",
+                            fontFamily: "var(--font-mono, monospace)",
+                            padding: "0.15rem 0.45rem",
+                            borderRadius: "4px",
+                            background: "rgba(65,65,252,0.3)",
+                            color: "#c7d2fe",
+                            border: "1px solid rgba(139,139,254,0.4)",
+                          }}
+                        >
+                          {isEn ? "VIEWING" : "ACTIVO"}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                  <td>{item.country}</td>
+                  <td>{item.elevation}</td>
+                  <td>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-mono, monospace)",
+                        color: item.fidelityScore >= 90 ? "#7fd579" : "#8b8bfe",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {item.fidelityScore}%
+                    </span>
+                  </td>
+                  <td>{targetName}</td>
+                  <td>
+                    <span className="bloom-tag-compat ALTA">{rolesText}</span>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
