@@ -285,7 +285,7 @@ export const DUAL_WORLD_PRESETS: DualWorldPreset[] = [
       subtitle: "Punto de Cuasi-Eterna Luz y Frío Extremo (Luna)",
       coordinates: "84.9° S · 12.9° E",
       instrument: "NASA LRO LOLA Altimetry / LAMP",
-      image: "/images/geology/moon-shackleton.jpg",
+      image: "/images/geology/moon-malapert.jpg",
       featureTag: "Point of Eternal Light (PEL)",
     },
     earthTwin: {
